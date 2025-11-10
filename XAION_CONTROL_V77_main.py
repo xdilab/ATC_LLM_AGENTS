@@ -356,12 +356,7 @@ def _get(row, key, default=None):
 
 
 # ---------- 4) LLM monitor: prompt builder + multi-backend sender ----------
-# This replaces the simple stub and gives you three options:
-#  - 'stub'   : print & return a simple structured dict (useful for offline debugging)
-#  - 'openai' : call an OpenAI-like API (openai.ChatCompletion or Completion)
-#  - 'hf'     : call a local Hugging Face causal model (transformers AutoModelForCausalLM)
-#
-# Configure by setting MONITOR_CONFIG dict below.
+
 
 MONITOR_CONFIG = {
     'mode': 'stub',            # 'stub' | 'openai' | 'hf'
@@ -542,11 +537,10 @@ def haversine_nm(lat1, lon1, lat2, lon2):
     return nm
 
 # -----------------------
-# Small runway DB for KGSO (replace with authoritative coords)
 # Each runway: {'id':'05/23', 'lat':..., 'lon':..., 'true_heading':...}
 # -----------------------
 XAION_RUNWAYS = [
-    # KGSO runways (example coords — replace with exact ones)
+    # KGSO runways 
     {'id': '05', 'lat': 36.1003, 'lon': -79.9378, 'true_heading': 052.0},
     {'id': '23', 'lat': 36.1003, 'lon': -79.9378, 'true_heading': 232.0},
     {'id': '14', 'lat': 36.0870, 'lon': -79.9740, 'true_heading': 140.0},
@@ -775,8 +769,8 @@ def build_monitor_payload(row, prev_row=None, inferred_phase=None, inferred_runw
     return payload
 
 # -----------------------
-# Stub: send to LLM monitor (replace with your actual model call)
-# -----------------------
+# Stub: send to LLM monitor 
+# ------------------------------------------------------------
 def send_to_llm_monitor(payload, llm_client=None):
 
 
@@ -1015,7 +1009,7 @@ _MUST_CONTAIN = {
     "cleared_tkof": ("cleared", "takeoff"),
 }
 
-# --- Normalizers (replace your current defs) ---
+# --- Normalizers---
 _TWR_119_CMD_RX  = re.compile(r'(?i)\b(contact(?:ing)?|switch(?:ing)?)\s+(?:the\s+)?tower\s+119\b')
 _TWR_119_ANY_RX  = re.compile(r'(?i)\bTower\s+119(?:\.1(?:\.1+)*)?\b')  # collapses 119.1.1 → 119.1
 _RWY_DUPE_RX     = re.compile(r'(?i)\bRunway\s*(\d{2})([LRC])\2\b')
@@ -4155,7 +4149,7 @@ with gr.Blocks() as demo:
     # Wrapper around run_simulation that guarantees the pilot box is blank in non-vocal modes
     def _run_and_debug(mode, comm_type, scenario, transcript, window, state):
         for (a, b, c, d, e, f, g) in run_simulation(mode, comm_type, scenario, transcript, window, state):
-            # a == pilot text; replace with "" unless Vocal Input mode
+            # a == pilot text; 
             a_out = a if mode == "Vocal Input" else ""
             yield a_out, b, c, d, e, snapshot_debug_dump(), g
 
