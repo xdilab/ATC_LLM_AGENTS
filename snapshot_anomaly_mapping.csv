@@ -1,0 +1,201 @@
+Anomaly_Family,Anomaly_Type,DT Time,pandas_index,csv_row_number
+Airborne Anomalies,Incorrect approach alignment â wrong runway,001000Z,20,22
+Speed / Movement,Acceleration inconsistent,003200Z,64,66
+Transponder / Emergency,Hijack squawk 7500,004300Z,86,88
+Speed / Movement,Acceleration inconsistent,004900Z,98,100
+Transponder / Emergency,Emergency squawk 7700,005200Z,104,106
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,005930Z,119,121
+Airborne Anomalies,Heading deviation during approach,012200Z,164,166
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,012630Z,173,175
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),013230Z,185,187
+Transponder / Emergency,Hijack squawk 7500,014430Z,209,211
+Transponder / Emergency,Transponder sudden change or corrupted squawk,015100Z,222,224
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,015500Z,230,232
+Speed / Movement,Groundspeed spike,015930Z,239,241
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),020430Z,249,251
+Airborne Anomalies,Heading deviation during approach,020600Z,252,254
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,020630Z,253,255
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,020700Z,254,256
+Transponder / Emergency,Radio failure squawk 7600,020800Z,256,258
+Speed / Movement,Groundspeed spike,021430Z,269,271
+Speed / Movement,Acceleration inconsistent,023100Z,302,304
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,024000Z,320,322
+Transponder / Emergency,Hijack squawk 7500,024930Z,339,341
+Speed / Movement,Groundspeed spike,025230Z,345,347
+Transponder / Emergency,Radio failure squawk 7600,025830Z,357,359
+Transponder / Emergency,Transponder sudden change or corrupted squawk,025900Z,358,360
+Speed / Movement,Acceleration inconsistent,031400Z,388,390
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,031530Z,391,393
+Airborne Anomalies,Go-around ignored â aircraft continues landing when told to go-around,033100Z,422,424
+Transponder / Emergency,Hijack squawk 7500,033730Z,435,437
+Speed / Movement,Acceleration inconsistent,034130Z,443,445
+Airborne Anomalies,Heading deviation during approach,034430Z,449,451
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,035000Z,460,462
+Speed / Movement,Groundspeed spike,035730Z,475,477
+Speed / Movement,Groundspeed spike,035800Z,476,478
+Airborne Anomalies,Altitude deviation â aircraft not following assigned altitude,040630Z,493,495
+Transponder / Emergency,Emergency squawk 7700,042030Z,521,523
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,042530Z,531,533
+Transponder / Emergency,Hijack squawk 7500,043030Z,541,543
+Speed / Movement,Groundspeed spike,043800Z,556,558
+Transponder / Emergency,Radio failure squawk 7600,050230Z,605,607
+Speed / Movement,Groundspeed spike,050800Z,616,618
+Airborne Anomalies,Altitude deviation â aircraft not following assigned altitude,051230Z,625,627
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),053030Z,661,663
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),053230Z,665,667
+Transponder / Emergency,Emergency squawk 7700,054230Z,685,687
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,054330Z,687,689
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,061600Z,752,754
+Speed / Movement,Acceleration inconsistent,062630Z,773,775
+Airborne Anomalies,Unstable approach â too high/low on final,063000Z,780,782
+Runway Safety / Surface Movement,Runway collision near-miss â two aircraft crossing paths,063800Z,796,798
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,064000Z,800,802
+Speed / Movement,Acceleration inconsistent,065600Z,832,834
+Speed / Movement,Groundspeed spike,070730Z,855,857
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,071200Z,864,866
+Speed / Movement,Groundspeed spike,071230Z,865,867
+Runway Safety / Surface Movement,Runway Occupancy â Aircraft stopped on runway,072700Z,894,896
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,073500Z,910,912
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,073700Z,914,916
+Transponder / Emergency,Transponder sudden change or corrupted squawk,075600Z,952,954
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,080230Z,965,967
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,080730Z,975,977
+Runway Safety / Surface Movement,Runway collision near-miss â two aircraft crossing paths,080930Z,979,981
+Airborne Anomalies,Incorrect approach alignment â wrong runway,081230Z,985,987
+Speed / Movement,Groundspeed spike,081700Z,994,996
+Airborne Anomalies,Go-around ignored â aircraft continues landing when told to go-around,082030Z,1001,1003
+Speed / Movement,Acceleration inconsistent,082230Z,1005,1007
+Airborne Anomalies,Heading deviation during approach,082900Z,1018,1020
+Speed / Movement,Acceleration inconsistent,083930Z,1039,1041
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,085700Z,1074,1076
+Transponder / Emergency,Emergency squawk 7700,090430Z,1089,1091
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,090600Z,1092,1094
+Transponder / Emergency,Hijack squawk 7500,092330Z,1127,1129
+Runway Safety / Surface Movement,Runway collision near-miss â two aircraft crossing paths,093630Z,1153,1155
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,093730Z,1155,1157
+Speed / Movement,Acceleration inconsistent,094100Z,1162,1164
+Airborne Anomalies,Heading deviation during approach,094130Z,1163,1165
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,094830Z,1177,1179
+Airborne Anomalies,Go-around ignored â aircraft continues landing when told to go-around,095430Z,1189,1191
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,100030Z,1201,1203
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),100230Z,1205,1207
+Transponder / Emergency,Transponder sudden change or corrupted squawk,100330Z,1207,1209
+Airborne Anomalies,Go-around ignored â aircraft continues landing when told to go-around,100730Z,1215,1217
+Speed / Movement,Acceleration inconsistent,100800Z,1216,1218
+Speed / Movement,Acceleration inconsistent,101030Z,1221,1223
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,101530Z,1231,1233
+Transponder / Emergency,Emergency squawk 7700,103700Z,1274,1276
+Airborne Anomalies,Unstable approach â too high/low on final,103800Z,1276,1278
+Speed / Movement,Groundspeed spike,103900Z,1278,1280
+Transponder / Emergency,Emergency squawk 7700,104100Z,1282,1284
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,104530Z,1291,1293
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,105530Z,1311,1313
+Runway Safety / Surface Movement,Runway collision near-miss â two aircraft crossing paths,105730Z,1315,1317
+Speed / Movement,Groundspeed spike,105930Z,1319,1321
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,110000Z,1320,1322
+Transponder / Emergency,Radio failure squawk 7600,111530Z,1351,1353
+Transponder / Emergency,Transponder sudden change or corrupted squawk,112030Z,1361,1363
+Airborne Anomalies,Unstable approach â too high/low on final,113200Z,1384,1386
+ADS-B Integrity / Spoofing,Duplicate Hex code (spoof),114630Z,1413,1415
+Speed / Movement,Acceleration inconsistent,114800Z,1416,1418
+Speed / Movement,Acceleration inconsistent,114930Z,1419,1421
+Transponder / Emergency,Hijack squawk 7500,115130Z,1423,1425
+Transponder / Emergency,Emergency squawk 7700,115600Z,1432,1434
+ADS-B Integrity / Spoofing,Duplicate Hex code (spoof),115630Z,1433,1435
+Speed / Movement,Acceleration inconsistent,121830Z,1477,1479
+Airborne Anomalies,Incorrect approach alignment â wrong runway,122730Z,1495,1497
+Airborne Anomalies,Incorrect approach alignment â wrong runway,123230Z,1505,1507
+Transponder / Emergency,Radio failure squawk 7600,125530Z,1551,1553
+Transponder / Emergency,Emergency squawk 7700,125800Z,1556,1558
+Airborne Anomalies,Incorrect approach alignment â wrong runway,125830Z,1557,1559
+Transponder / Emergency,Transponder sudden change or corrupted squawk,130630Z,1573,1575
+Speed / Movement,Groundspeed spike,131000Z,1580,1582
+Speed / Movement,Acceleration inconsistent,131300Z,1586,1588
+Transponder / Emergency,Transponder sudden change or corrupted squawk,131430Z,1589,1591
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,131500Z,1590,1592
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,132700Z,1614,1616
+Runway Safety / Surface Movement,Runway Occupancy â Aircraft stopped on runway,140900Z,1698,1700
+Runway Safety / Surface Movement,Runway collision near-miss â two aircraft crossing paths,141900Z,1718,1720
+Speed / Movement,Groundspeed spike,143030Z,1741,1743
+Speed / Movement,Acceleration inconsistent,143100Z,1742,1744
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,143200Z,1744,1746
+Transponder / Emergency,Transponder sudden change or corrupted squawk,143800Z,1756,1758
+Speed / Movement,Groundspeed spike,144430Z,1769,1771
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,145130Z,1783,1785
+Transponder / Emergency,Emergency squawk 7700,150500Z,1810,1812
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,151700Z,1834,1836
+Airborne Anomalies,Altitude deviation â aircraft not following assigned altitude,152400Z,1848,1850
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),152500Z,1850,1852
+Airborne Anomalies,Go-around ignored â aircraft continues landing when told to go-around,152630Z,1853,1855
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,153530Z,1871,1873
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,153600Z,1872,1874
+Speed / Movement,Acceleration inconsistent,153700Z,1874,1876
+Speed / Movement,Groundspeed spike,153830Z,1877,1879
+Airborne Anomalies,Heading deviation during approach,154330Z,1887,1889
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),154530Z,1891,1893
+Speed / Movement,Groundspeed spike,154730Z,1895,1897
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,155330Z,1907,1909
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,160630Z,1933,1935
+Speed / Movement,Acceleration inconsistent,160800Z,1936,1938
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),162100Z,1962,1964
+Transponder / Emergency,Radio failure squawk 7600,162330Z,1967,1969
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,163030Z,1981,1983
+Transponder / Emergency,Hijack squawk 7500,163430Z,1989,1991
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),163700Z,1994,1996
+Transponder / Emergency,Radio failure squawk 7600,165800Z,2036,2038
+Airborne Anomalies,Unstable approach â too high/low on final,170100Z,2042,2044
+Transponder / Emergency,Transponder sudden change or corrupted squawk,170400Z,2048,2050
+Transponder / Emergency,Radio failure squawk 7600,170500Z,2050,2052
+ADS-B Integrity / Spoofing,Duplicate Hex code (spoof),171030Z,2061,2063
+Runway Safety / Surface Movement,Runway collision near-miss â two aircraft crossing paths,171130Z,2063,2065
+Speed / Movement,Groundspeed spike,171730Z,2075,2077
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,173700Z,2114,2116
+Speed / Movement,Groundspeed spike,173930Z,2119,2121
+Runway Safety / Surface Movement,Runway Occupancy â Aircraft stopped on runway,174200Z,2124,2126
+Airborne Anomalies,Altitude deviation â aircraft not following assigned altitude,174300Z,2126,2128
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,175400Z,2148,2150
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),180700Z,2174,2176
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,180930Z,2179,2181
+Runway Safety / Surface Movement,Runway collision near-miss â two aircraft crossing paths,181400Z,2188,2190
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,181600Z,2192,2194
+Transponder / Emergency,Emergency squawk 7700,182030Z,2201,2203
+ADS-B Integrity / Spoofing,Duplicate Hex code (spoof),182930Z,2219,2221
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,183300Z,2226,2228
+Speed / Movement,Groundspeed spike,183400Z,2228,2230
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),183500Z,2230,2232
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,183830Z,2237,2239
+Transponder / Emergency,Hijack squawk 7500,184000Z,2240,2242
+Airborne Anomalies,Altitude deviation â aircraft not following assigned altitude,184430Z,2249,2251
+Airborne Anomalies,Unstable approach â too high/low on final,185300Z,2266,2268
+Airborne Anomalies,Heading deviation during approach,191030Z,2301,2303
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,191230Z,2305,2307
+Airborne Anomalies,Heading deviation during approach,191300Z,2306,2308
+Airborne Anomalies,Incorrect approach alignment â wrong runway,191730Z,2315,2317
+Speed / Movement,Acceleration inconsistent,191800Z,2316,2318
+Transponder / Emergency,Emergency squawk 7700,192200Z,2324,2326
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,192530Z,2331,2333
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,192700Z,2334,2336
+Transponder / Emergency,Emergency squawk 7700,195900Z,2398,2400
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),200500Z,2410,2412
+Transponder / Emergency,Transponder sudden change or corrupted squawk,200530Z,2411,2413
+Airborne Anomalies,Unstable approach â too high/low on final,201100Z,2422,2424
+Airborne Anomalies,Heading deviation during approach,201800Z,2436,2438
+Transponder / Emergency,Hijack squawk 7500,204330Z,2487,2489
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,204600Z,2492,2494
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,205230Z,2505,2507
+Transponder / Emergency,Transponder sudden change or corrupted squawk,210400Z,2528,2530
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,212700Z,2574,2576
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,213800Z,2596,2598
+ADS-B Integrity / Spoofing,Stale Seen Position (>10 sec),213930Z,2599,2601
+Runway Safety / Surface Movement,Head-on conflict â opposing runway direction,215300Z,2626,2628
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,220300Z,2646,2648
+Runway Safety / Surface Movement,Runway Incursion â Taxiway â Runway without clearance,220700Z,2654,2656
+Airborne Anomalies,Heading deviation during approach,222130Z,2683,2685
+ADS-B Integrity / Spoofing,Position jump (teleport) anomaly,224500Z,2730,2732
+Airborne Anomalies,Incorrect approach alignment â wrong runway,225930Z,2759,2761
+Airborne Anomalies,Incorrect approach alignment â wrong runway,230500Z,2770,2772
+Airborne Anomalies,Go-around ignored â aircraft continues landing when told to go-around,230600Z,2772,2774
+ADS-B Integrity / Spoofing,Low NIC/NAC â low integrity,232200Z,2804,2806
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,232930Z,2819,2821
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,233430Z,2829,2831
+Runway Safety / Surface Movement,Taxiway misrouting â taxi route deviates from expected,233700Z,2834,2836
