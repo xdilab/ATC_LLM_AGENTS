@@ -1,7 +1,8 @@
 # ===============================
-# XAION_CONTROL_ST_V77.py 
+# XAION_CONTROL_ST_V78.py 
 # Foundations: config, models, helpers, parsing, scenarios
 # ===============================
+
 
 import os, gc, re, ast, math, time, socket, tempfile, uuid, wave, random
 from collections import deque
@@ -53,6 +54,7 @@ except Exception:
 USE_WHISPER_API = str(USE_WHISPER_API_RAW).strip().lower() not in ("0", "false", "no", "")
 if OPENAI_API_KEY:
     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+
 
 # -------------------------------
 # CONSTANTS / PATHS
@@ -250,7 +252,7 @@ def _audio_duration_sec(path: str) -> float | None:
 KGSO_DEP_FREQ_A = "124.35"  # sectors 250–049 (wraps across 360→0)
 KGSO_DEP_FREQ_B = "126.6"   # sectors 050–249
 # -------------------------------
-# Helpers / parsing / gates
+# Helpers / parsing / gates / lanes
 # -------------------------------
 import json
 import os
@@ -395,6 +397,8 @@ def build_monitor_prompt(payload: dict) -> str:
         f"Be concise and prefer operationally-safe, conservative actions (e.g., 'confirm readback', 'stop taxi', 'issue go-around').\n"
     )
     return prompt
+
+
 
 # Lazy-loaded HF model cache
 _HF_MONITOR = {'tokenizer': None, 'model': None}
