@@ -1,9 +1,6 @@
 # ===============================
-# XAION_CONTROL_ST_main.py 
-# Foundations: config, models, helpers, parsing, scenarios
+# XAION_CONTROL_ST_main.py
 # ===============================
-
-
 
 import os, gc, re, ast, math, time, socket, tempfile, uuid, wave, random
 from collections import deque
@@ -12,6 +9,7 @@ import numpy as np
 import torch
 import pandas as pd
 import gradio as gr
+import scipy.signal as sps
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # -------------------------------
@@ -56,7 +54,6 @@ USE_WHISPER_API = str(USE_WHISPER_API_RAW).strip().lower() not in ("0", "false",
 if OPENAI_API_KEY:
     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
-
 # -------------------------------
 # CONSTANTS / PATHS
 # -------------------------------
@@ -73,6 +70,8 @@ ATC_INITIAL_PROMPT = (
     "heading, turn left heading, speed, knots, kts, feet, degrees, nm.\n"
     "Prefer numerals and standard ATC call signs."
 )
+
+
 
 KGSO_RUNWAYS = {"05": (30, 60), "23": (210, 240), "14": (140, 170), "32": (320, 350)}
 DEFAULT_RWY_PRIMARY = "05R"   # 05R/23L is the 10,001' runway
@@ -253,16 +252,114 @@ def _audio_duration_sec(path: str) -> float | None:
 KGSO_DEP_FREQ_A = "124.35"  # sectors 250–049 (wraps across 360→0)
 KGSO_DEP_FREQ_B = "126.6"   # sectors 050–249
 # -------------------------------
-# Helpers / parsing / gates / lanes
+# Helpers / parsing / gates
 # -------------------------------
+# -----------------------
+# XAION: Runway/Phase heuristics + anomaly detectors + monitor payload
+# Paste this block after your imports near the top of XAION_CONTROL_fullscript.py
+# -----------------------
+# -----------------------
+# XAION: Runway loader + LLM monitor (full implementations)
+# Paste after your imports and existing helper functions
+# -----------------------
 import json
 import os
 import math
 import time
 from typing import List, Dict, Optional
 
-# ---------- 3) Runway config helpers ----------
+def generate_phi4_response(prompt: str, max_new_tokens: int = 64) -> str:
 
+    return _hf_generate_new(
+        prompt,
+        max_new_tokens=max_new_tokens,
+        temperature=0.3,   # a bit more deterministic for repair
+        top_p=0.9,
+    )
+
+
+def repair_transcript_with_llm(
+    raw_text: str,
+    phase: str | None = None,
+    dt_context: str | None = None,
+    rag_snippets: str | None = None,
+) -> str:
+    """
+    Use the Phi-4 ATC model as a transcript corrector.
+    Input: noisy ASR from Whisper.
+    Output: a single clean pilot line (no headings, no explanations).
+    """
+    raw_text = (raw_text or "").strip()
+    if not raw_text:
+        return ""
+
+    ctx_parts: list[str] = []
+    if phase:
+        ctx_parts.append(f"Phase: {phase}")
+    if dt_context:
+        ctx_parts.append(f"Context: {dt_context}")
+    if rag_snippets:
+        ctx_parts.append(f"Relevant phraseology examples:\n{rag_snippets}")
+
+    ctx_block = "\n".join(ctx_parts) if ctx_parts else "(no extra context)"
+
+    prompt = f"""
+You are a function that converts noisy ATC ASR transcripts into clean pilot
+radio transmissions.
+
+STRICT OUTPUT RULES:
+- Output EXACTLY ONE line of corrected pilot radio speech.
+- Do NOT include headings, bullet points, markdown, multiple solutions,
+  explanations, or analysis.
+- Do NOT write "Solution", "Instruction", or any description.
+- Just return the final radio transmission text.
+
+If some part is truly unintelligible, replace only that part with <UNK>.
+
+Context:
+{ctx_block}
+
+Noisy ASR transcript:
+\"\"\"{raw_text}\"\"\"
+"""
+
+    # Use the Phi-4 wrapper
+    out = generate_phi4_response(prompt, max_new_tokens=64)  # type: ignore[name-defined]
+    out = (out or "").strip()
+
+    # --- Cleaning pass to kill any leaked instructions/markdown ---
+    try:
+        # 1) Use your existing helper to remove generic prompt scaffolding
+        out = _strip_prompt_bleed(out)  # type: ignore[name-defined]
+    except Exception:
+        pass
+
+    # 2) Remove markdown headings / "Solution"/"Instruction" lines, keep first good line
+    lines = [ln.strip() for ln in out.splitlines()]
+    filtered: list[str] = []
+    for ln in lines:
+        lower = ln.lower()
+        if not ln:
+            continue
+        if lower.startswith(("##", "#", "*", "-", "solution", "instruction",
+                             "cleaned-up pilot radio transcript", "cleaned up pilot radio transcript")):
+            continue
+        if lower.startswith(("you are", "you're an", "you’re an")):
+            continue
+        filtered.append(ln)
+
+    if filtered:
+        out = filtered[0]
+    else:
+        # Fall back to first non-empty line, even if it's messy
+        non_empty = [ln for ln in lines if ln]
+        out = non_empty[0] if non_empty else ""
+
+    return out.strip()
+
+
+# ---------- 3) Runway config helpers ----------
+# Default (example) KGSO runway threshold coords (replace with authoritative values)
 _DEFAULT_XAION_RUNWAYS = [
     {'id': '05', 'lat': 36.100300, 'lon': -79.937800, 'true_heading': 52.0},
     {'id': '23', 'lat': 36.100300, 'lon': -79.937800, 'true_heading': 232.0},
@@ -274,6 +371,10 @@ XAION_RUNWAYS = list(_DEFAULT_XAION_RUNWAYS)  # global runtime list
 
 def set_xaion_runways(runways: List[Dict]):
     """
+    Replace the in-memory XAION_RUNWAYS with a provided list of runway dicts.
+    Each runway dict must contain keys: 'id', 'lat', 'lon', 'true_heading'.
+    Example:
+        set_xaion_runways([{'id':'05','lat':36.1,'lon':-79.93,'true_heading':52.0}, ...])
     """
     global XAION_RUNWAYS
     safe = []
@@ -331,7 +432,6 @@ def load_runways_from_csv(path: str, id_col='id', lat_col='lat', lon_col='lon', 
     return XAION_RUNWAYS
 
 def get_xaion_runways():
-
     """Return current runways (runtime copy)."""
     return list(XAION_RUNWAYS)
 
@@ -359,7 +459,12 @@ def _get(row, key, default=None):
 
 
 # ---------- 4) LLM monitor: prompt builder + multi-backend sender ----------
-
+# This replaces the simple stub and gives you three options:
+#  - 'stub'   : print & return a simple structured dict (useful for offline debugging)
+#  - 'openai' : call an OpenAI-like API (openai.ChatCompletion or Completion)
+#  - 'hf'     : call a local Hugging Face causal model (transformers AutoModelForCausalLM)
+#
+# Configure by setting MONITOR_CONFIG dict below.
 
 MONITOR_CONFIG = {
     'mode': 'stub',            # 'stub' | 'openai' | 'hf'
@@ -398,8 +503,6 @@ def build_monitor_prompt(payload: dict) -> str:
         f"Be concise and prefer operationally-safe, conservative actions (e.g., 'confirm readback', 'stop taxi', 'issue go-around').\n"
     )
     return prompt
-
-
 
 # Lazy-loaded HF model cache
 _HF_MONITOR = {'tokenizer': None, 'model': None}
@@ -542,10 +645,11 @@ def haversine_nm(lat1, lon1, lat2, lon2):
     return nm
 
 # -----------------------
+# Small runway DB for KGSO (replace with authoritative coords)
 # Each runway: {'id':'05/23', 'lat':..., 'lon':..., 'true_heading':...}
 # -----------------------
 XAION_RUNWAYS = [
-    # KGSO runways 
+    # KGSO runways (example coords — replace with exact ones)
     {'id': '05', 'lat': 36.1003, 'lon': -79.9378, 'true_heading': 052.0},
     {'id': '23', 'lat': 36.1003, 'lon': -79.9378, 'true_heading': 232.0},
     {'id': '14', 'lat': 36.0870, 'lon': -79.9740, 'true_heading': 140.0},
@@ -774,11 +878,14 @@ def build_monitor_payload(row, prev_row=None, inferred_phase=None, inferred_runw
     return payload
 
 # -----------------------
-# Stub: send to LLM monitor 
-# ------------------------------------------------------------
+# Stub: send to LLM monitor (replace with your actual model call)
+# -----------------------
 def send_to_llm_monitor(payload, llm_client=None):
-
-
+    """
+    Replace this stub with your LLM monitor call.
+    Example: construct a prompt summarizing payload and call your monitor model.
+    For now it prints to stdout for debugging.
+    """
     try:
         s = json.dumps(payload, default=str)
     except Exception:
@@ -793,8 +900,9 @@ def send_to_llm_monitor(payload, llm_client=None):
 # -----------------------
 def process_row_for_monitor(row, prev_row=None, llm_client=None):
     try:
-   
-
+        # ensure row is dict-like for safe access
+        # Some of your rows may have Aircraft(Obj) stored as string; try literal_eval safely
+        # If your row contains a nested 'Aircraft(Obj)' field as string, uncomment parse logic:
         if isinstance(row, dict):
             pass
         else:
@@ -1014,7 +1122,7 @@ _MUST_CONTAIN = {
     "cleared_tkof": ("cleared", "takeoff"),
 }
 
-# --- Normalizers---
+# --- Normalizers (replace your current defs) ---
 _TWR_119_CMD_RX  = re.compile(r'(?i)\b(contact(?:ing)?|switch(?:ing)?)\s+(?:the\s+)?tower\s+119\b')
 _TWR_119_ANY_RX  = re.compile(r'(?i)\bTower\s+119(?:\.1(?:\.1+)*)?\b')  # collapses 119.1.1 → 119.1
 _RWY_DUPE_RX     = re.compile(r'(?i)\bRunway\s*(\d{2})([LRC])\2\b')
@@ -1969,16 +2077,65 @@ def _resample_to_16k(wave_np: np.ndarray, sr: int) -> np.ndarray:
     x_new = np.linspace(0, 1, num=int(len(wave_np) * 16000 / max(sr, 1)), endpoint=False)
     return np.interp(x_new, x_old, wave_np).astype(np.float32)
 
-def transcribe_audio(audio_numpy_tuple) -> str:
-    global whisper_model
-    if audio_numpy_tuple is None: return ""
-    sr, data = audio_numpy_tuple
-    if data is None or len(data) == 0: return ""
 
+
+
+def _preprocess_for_asr(sr: int, data: np.ndarray) -> tuple[int, np.ndarray]:
+    """Lightweight denoise / band-pass before Whisper."""
+    # Ensure numpy array
+    x = np.asarray(data, dtype=np.float32)
+
+    # If stereo, downmix to mono
+    if x.ndim == 2:
+        x = x.mean(axis=1)
+
+    # Simple band-pass ~300–3400 Hz to reduce hum/hiss
+    nyq = 0.5 * sr
+    low = 300.0 / nyq
+    high = 3400.0 / nyq
+    try:
+        b, a = sps.butter(4, [low, high], btype="band")
+        x = sps.lfilter(b, a, x)
+    except Exception:
+        # If filter design fails (weird sr, etc.), just fall back to raw
+        pass
+
+    # Normalize to a reasonable peak
+    peak = float(np.max(np.abs(x))) if x.size else 1.0
+    if peak == 0.0:
+        peak = 1.0
+    x = x / peak
+    x = np.clip(x, -1.0, 1.0).astype(np.float32)
+
+    return sr, x
+
+
+def transcribe_audio(audio_numpy_tuple) -> str:
+    """
+    Transcribe audio from the mic (or LiveATC clip) using either Whisper API
+    or local Whisper, with a light preprocessing step to help in noisy ATC
+    conditions.
+    """
+    global whisper_model
+
+    if audio_numpy_tuple is None:
+        return ""
+
+    sr, data = audio_numpy_tuple
+    if data is None or len(data) == 0:
+        return ""
+
+    # NEW: light preprocessing before any Whisper call
+    sr, data = _preprocess_for_asr(int(sr), np.array(data, dtype=np.float32))
+
+    # --- Branch 1: OpenAI Whisper API (if enabled) ------------------------
     if USE_WHISPER_API and openai_client is not None:
         try:
-            tmp = os.path.join(tempfile.gettempdir(), f"xaion_{uuid.uuid4().hex}.wav")
-            _write_wav_float32(tmp, int(sr), np.array(data, dtype=np.float32))
+            tmp = os.path.join(
+                tempfile.gettempdir(),
+                f"xaion_{uuid.uuid4().hex}.wav"
+            )
+            _write_wav_float32(tmp, int(sr), data)
             with open(tmp, "rb") as f:
                 result = openai_client.audio.transcriptions.create(
                     model="whisper-1",
@@ -1988,16 +2145,25 @@ def transcribe_audio(audio_numpy_tuple) -> str:
                     response_format="verbose_json",
                     temperature=0.0,
                 )
-            try: os.remove(tmp)
-            except Exception: pass
+            try:
+                os.remove(tmp)
+            except Exception:
+                pass
+
             txt = getattr(result, "text", "") or ""
             return normalize_transcript(txt)
         except Exception as e:
             debug_line(f"[Whisper API] error: {e} — falling back to local…")
 
+    # --- Branch 2: Local Whisper model -----------------------------------
     if whisper_model is None:
         import whisper as _wh
-        whisper_model = _wh.load_model(WHISPER_MODEL_SIZE, device=str(device))
+        whisper_model = _wh.load_model(
+            WHISPER_MODEL_SIZE,
+            device=str(device)
+        )
+
+    # Resample to 16 kHz mono for Whisper
     wav16 = _resample_to_16k(np.array(data, dtype=np.float32), int(sr))
     wav16 = np.clip(wav16, -1.0, 1.0).astype(np.float32)
 
@@ -2012,10 +2178,12 @@ def transcribe_audio(audio_numpy_tuple) -> str:
         best_of=5,
         initial_prompt=ATC_INITIAL_PROMPT,
         without_timestamps=True,
-        no_speech_threshold=0.3,
-        logprob_threshold=-1.2,
-        compression_ratio_threshold=2.2,
+        # Slightly more permissive thresholds for noisy ATC audio
+        no_speech_threshold=0.1,
+        logprob_threshold=-2.0,
+        compression_ratio_threshold=2.4,
     )
+
     return normalize_transcript(result.get("text") or "")
 
 # -------------------------------
@@ -2262,7 +2430,8 @@ def _first_open_port(preferred: int, tries: int = 6):
             except OSError:
                 continue
     return preferred
-
+# ===============================
+# XAION_CONTROL_ST_V56.py — Part 2/3
 # State machine, validators, generators, voice/full-sim runners
 # ===============================
 
@@ -3896,7 +4065,8 @@ def single_handoff(comm_type: str, scenario_text: str):
     monitor_header("XAION SIM END (SINGLE HANDOFF)")
 
 
-
+# ===============================
+# XAION_CONTROL_ST_V56.py — Part 3/3
 # Unified run handler + Gradio UI (Pilot transcript visible only in Vocal Input)
 # ===============================
 
@@ -4121,10 +4291,47 @@ with gr.Blocks() as demo:
 
     # Mic -> transcript live update
     def _on_audio(audio, current_text):
-        text = transcribe_audio(audio)
-        debug_line(f"[VOICE] Mic updated; transcript len={len(text or '')}.")
-        return text or current_text or ""
-    mic.change(fn=_on_audio, inputs=[mic, transcript_box], outputs=transcript_box)
+        # 1) Get raw ASR from Whisper
+        raw = transcribe_audio(audio)
+
+        # If Whisper gave us nothing, fall back to whatever was there
+        if not raw:
+            debug_line("[VOICE] Mic updated; transcript empty or ASR failed.")
+            return current_text or ""
+
+        # 2)
+        phase = None  # e.g., "ground" / "approach" once you wire it
+        dt_ctx = None  # e.g., a short DT context string
+        rag_snips = None  # small RAG snippets, if you want
+
+        # 3) Run LLM-based repair
+        try:
+            clean = repair_transcript_with_llm(
+                raw_text=raw,
+                phase=phase,
+                dt_context=dt_ctx,
+                rag_snippets=rag_snips,
+            )
+        except NameError:
+            # If repair function not defined yet, just use raw
+            clean = raw
+
+        debug_line(
+            f"[VOICE] Mic updated; raw_len={len(raw or '')}, "
+            f"clean_len={len(clean or '')}."
+        )
+
+        # Prefer cleaned text, then raw, then whatever was in the box
+        return clean or raw or current_text or ""
+
+
+    mic.change(
+        fn=_on_audio,
+        inputs=[mic, transcript_box],
+        outputs=transcript_box,
+    )
+
+
 
     # Toggle visibility depending on mode
     def _toggle_rows(mode):
@@ -4154,7 +4361,7 @@ with gr.Blocks() as demo:
     # Wrapper around run_simulation that guarantees the pilot box is blank in non-vocal modes
     def _run_and_debug(mode, comm_type, scenario, transcript, window, state):
         for (a, b, c, d, e, f, g) in run_simulation(mode, comm_type, scenario, transcript, window, state):
-            # a == pilot text; 
+            # a == pilot text; replace with "" unless Vocal Input mode
             a_out = a if mode == "Vocal Input" else ""
             yield a_out, b, c, d, e, snapshot_debug_dump(), g
 
