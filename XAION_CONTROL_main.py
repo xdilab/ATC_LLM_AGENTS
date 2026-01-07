@@ -1,5 +1,6 @@
 # ===============================
-# XAION_CONTROL_ST_main.py
+# XAION_CONTROL_ST_main
+# Foundations: config, models, helpers, parsing, scenarios
 # ===============================
 
 import os, gc, re, ast, math, time, socket, tempfile, uuid, wave, random
@@ -255,13 +256,99 @@ KGSO_DEP_FREQ_B = "126.6"   # sectors 050–249
 # Helpers / parsing / gates
 # -------------------------------
 # -----------------------
-# XAION: Runway/Phase heuristics + anomaly detectors + monitor payload
-# Paste this block after your imports near the top of XAION_CONTROL_fullscript.py
-# -----------------------
+
 # -----------------------
 # XAION: Runway loader + LLM monitor (full implementations)
 # Paste after your imports and existing helper functions
 # -----------------------
+# -------------------------------
+# Simple wrapper: normalize comms lines (freqs, runway, etc.)
+# Safe to call even if normalization isn't wired yet.
+# -------------------------------
+
+def _infer_callsign_from_text(text: str | None) -> str | None:
+    """
+
+    """
+    if not text:
+        return None
+
+    s = (text or "").upper()
+
+    # 1) Direct airline-style callsign, e.g. AAL202, UAL451, DAL2230
+    m = re.search(r"\b([A-Z]{2,3}\d{2,4})\b", s)
+    if m:
+        return m.group(1)
+
+    # 2) Brand + number patterns
+    #    "DELTA 2230" -> DAL2230
+    if "DELTA" in s:
+        m = re.search(r"DELTA\s+(\d{2,4})", s)
+        if m:
+            return f"DAL{m.group(1)}"
+
+    if "UNITED" in s:
+        m = re.search(r"UNITED\s+(\d{2,4})", s)
+        if m:
+            return f"UAL{m.group(1)}"
+
+    if "AMERICAN" in s:
+        m = re.search(r"AMERICAN\s+(\d{2,4})", s)
+        if m:
+            return f"AAL{m.group(1)}"
+
+    # 3) N-number GA callsigns, e.g. N123AB
+    m = re.search(r"\bN\d{3,5}[A-Z]{0,2}\b", s)
+    if m:
+        return m.group(0)
+
+    return None
+
+
+
+def _norm_comm_line(s: str, *, hdg=None, runway=None) -> str:
+    """
+    Best-effort normalization for ATC communication lines.
+    Uses _normalize_comm_freqs if available; otherwise just
+    returns the string unchanged.
+    """
+    try:
+        return _normalize_comm_freqs(s, hdg=hdg, runway=runway)
+    except Exception:
+        # If the normalizer isn't defined or raises, just pass through.
+        return s
+
+
+def _maybe_rollout_handoff(
+    callsign: str,
+    last_pilot_text: str | None,
+    runway_hint: str | None = None,
+) -> str | None:
+    """
+    If the last pilot line sounds like rollout / vacating the runway,
+    return a fixed exit + Ground handoff. Otherwise return None.
+    """
+    if not last_pilot_text:
+        return None
+
+    lp = last_pilot_text.lower()
+    if not (
+        "rolling out" in lp
+        or "roll out" in lp
+        or ("clear of" in lp and "runway" in lp)
+        or ("vacated" in lp and "runway" in lp)
+    ):
+        return None
+
+    # Simple, demo-friendly default. You can tweak taxiway / frequency.
+    core = "turn left when able, exit via Taxiway Kilo, contact Ground on 121.9."
+    line = atc_prefix_and_dedup(callsign, core)
+    line = _normalize_tower_and_runway(line)
+    line = _norm_comm_line(line, runway=runway_hint)
+
+    return line
+
+
 import json
 import os
 import math
@@ -285,14 +372,13 @@ def repair_transcript_with_llm(
     rag_snippets: str | None = None,
 ) -> str:
     """
-    Use the Phi-4 ATC model as a transcript corrector.
-    Input: noisy ASR from Whisper.
-    Output: a single clean pilot line (no headings, no explanations).
+
     """
     raw_text = (raw_text or "").strip()
     if not raw_text:
         return ""
 
+    # ---- Build context block for the prompt ----
     ctx_parts: list[str] = []
     if phase:
         ctx_parts.append(f"Phase: {phase}")
@@ -309,10 +395,10 @@ radio transmissions.
 
 STRICT OUTPUT RULES:
 - Output EXACTLY ONE line of corrected pilot radio speech.
-- Do NOT include headings, bullet points, markdown, multiple solutions,
-  explanations, or analysis.
-- Do NOT write "Solution", "Instruction", or any description.
-- Just return the final radio transmission text.
+- Do NOT include headings, bullet points, markdown, numbered "solutions",
+  "instructions", or any explanation.
+- Do NOT write things like "Solution", "Instruction", "Cleaned up radio transmission".
+- Just return the final radio transmission text only.
 
 If some part is truly unintelligible, replace only that part with <UNK>.
 
@@ -323,39 +409,54 @@ Noisy ASR transcript:
 \"\"\"{raw_text}\"\"\"
 """
 
-    # Use the Phi-4 wrapper
+    # ---- Call Phi-4 via your wrapper ----
     out = generate_phi4_response(prompt, max_new_tokens=64)  # type: ignore[name-defined]
     out = (out or "").strip()
 
-    # --- Cleaning pass to kill any leaked instructions/markdown ---
+    # Try to strip generic prompt scaffolding if helper exists
     try:
-        # 1) Use your existing helper to remove generic prompt scaffolding
         out = _strip_prompt_bleed(out)  # type: ignore[name-defined]
     except Exception:
         pass
 
-    # 2) Remove markdown headings / "Solution"/"Instruction" lines, keep first good line
-    lines = [ln.strip() for ln in out.splitlines()]
-    filtered: list[str] = []
+    # ---- Line-level cleaning ----
+    lines = [ln.strip() for ln in out.splitlines() if ln.strip()]
+
+    # Anything containing these substrings is considered "instruction junk"
+    banned_substrings = (
+        "solution",
+        "instruction",
+        "cleaned up",
+        "cleaned-up",
+        "radio transmission",
+        "cleaned-up radio",
+        "cleaned up radio",
+        "you are ",
+        "you're ",
+        "you’re ",
+    )
+
+    cleaned_lines: list[str] = []
     for ln in lines:
         lower = ln.lower()
-        if not ln:
+        if any(b in lower for b in banned_substrings):
+            # e.g. "Cleaned up radio transmission: ## Solution 1."
             continue
-        if lower.startswith(("##", "#", "*", "-", "solution", "instruction",
-                             "cleaned-up pilot radio transcript", "cleaned up pilot radio transcript")):
-            continue
-        if lower.startswith(("you are", "you're an", "you’re an")):
-            continue
-        filtered.append(ln)
+        cleaned_lines.append(ln)
 
-    if filtered:
-        out = filtered[0]
+    # Choose candidate: first "safe" line, otherwise fall back to raw ASR
+    if cleaned_lines:
+        candidate = cleaned_lines[0]
     else:
-        # Fall back to first non-empty line, even if it's messy
-        non_empty = [ln for ln in lines if ln]
-        out = non_empty[0] if non_empty else ""
+        candidate = raw_text   # nothing trustworthy from LLM
 
-    return out.strip()
+    # If candidate is suspiciously short (like "Solution 1." stripped),
+    # also fall back to raw_text
+    if len(candidate.strip()) < 8:
+        candidate = raw_text
+
+    return candidate.strip()
+
 
 
 # ---------- 3) Runway config helpers ----------
@@ -371,10 +472,7 @@ XAION_RUNWAYS = list(_DEFAULT_XAION_RUNWAYS)  # global runtime list
 
 def set_xaion_runways(runways: List[Dict]):
     """
-    Replace the in-memory XAION_RUNWAYS with a provided list of runway dicts.
-    Each runway dict must contain keys: 'id', 'lat', 'lon', 'true_heading'.
-    Example:
-        set_xaion_runways([{'id':'05','lat':36.1,'lon':-79.93,'true_heading':52.0}, ...])
+
     """
     global XAION_RUNWAYS
     safe = []
@@ -645,8 +743,7 @@ def haversine_nm(lat1, lon1, lat2, lon2):
     return nm
 
 # -----------------------
-# Small runway DB for KGSO (replace with authoritative coords)
-# Each runway: {'id':'05/23', 'lat':..., 'lon':..., 'true_heading':...}
+
 # -----------------------
 XAION_RUNWAYS = [
     # KGSO runways (example coords — replace with exact ones)
@@ -2221,12 +2318,62 @@ def _strip_role_leaks(text: str) -> str:
     text = re.sub(r"\s{2,}", " ", text).strip(" ,")
     return text
 
+# def _first_sentence(text: str) -> str:
+#     parts = re.split(r"[.;\n]", text)
+#     for p in parts:
+#         p = p.strip()
+#         if p: return p + "."
+#     return text.strip()
+
 def _first_sentence(text: str) -> str:
-    parts = re.split(r"[.;\n]", text)
+
+
+    if not text:
+        return ""
+
+    # Split on sentence boundaries or newlines
+    parts = [p.strip() for p in re.split(r"[\n]", text) if p.strip()]
+    if not parts:
+        return ""
+
+    # Helper to normalize a candidate
+    def _clean_candidate(p: str) -> str:
+        # Drop leading role labels like "ATC:" or "Pilot:"
+        p2 = re.sub(r"(?i)^(?:atc|pilot)\s*[:\-]\s*", "", p).strip()
+
+        # Drop leading callsign + brand-only tagline if present
+        # e.g. "AAL202, This is XAION CONTROL. Roger, AAL202."
+        brand_rx = re.compile(r"(?i)this is\s+xaion\s+control\.?")
+        if brand_rx.search(p2):
+            # If there's additional text after the brand, keep that
+            after = brand_rx.sub("", p2).strip(" ,")
+            if after:
+                p2 = after
+
+        return p2.strip()
+
+    # Walk through parts and return the first non-empty, non-pure-tagline sentence
     for p in parts:
-        p = p.strip()
-        if p: return p + "."
-    return text.strip()
+        cleaned = _clean_candidate(p)
+        if cleaned:
+            # Truncate at the first sentence-ending punctuation inside this fragment
+            first = re.split(r"(?<=[\.\!\?])\s+", cleaned)[0].strip()
+            if not first:
+                continue
+            if first[-1] not in ".!?":
+                first += "."
+            return first
+
+    # Fallback: just return the original text trimmed to one sentence
+    fallback = parts[0]
+    fallback = re.split(r"(?<=[\.\!\?])\s+", fallback)[0].strip()
+    if fallback and fallback[-1] not in ".!?":
+        fallback += "."
+    return fallback
+
+
+
+
 
 def _strip_control_artifacts(text: str, callsign: str) -> str:
     t = text.strip()
@@ -2234,6 +2381,7 @@ def _strip_control_artifacts(text: str, callsign: str) -> str:
         t = re.sub(r"^This is XAION CONTROL\.?\s*", "", t, flags=re.I)
     t = re.sub(r"\bNone\b", callsign or "None", t)
     return t
+
 
 def clean_response(text, *, phase="approach", runway_hint=None, callsign=""):
     if not text: return ""
@@ -2430,9 +2578,7 @@ def _first_open_port(preferred: int, tries: int = 6):
             except OSError:
                 continue
     return preferred
-# ===============================
-# XAION_CONTROL_ST_V56.py — Part 2/3
-# State machine, validators, generators, voice/full-sim runners
+
 # ===============================
 
 # -------------------------------
@@ -2639,10 +2785,33 @@ def gen_once(role, dialogue, ctx):
       - Pilot fallback: synthesize a full readback from the last ATC when the LLM under-performs
         or tries to ask 'say again'.
       - Normalizes Tower frequency, runway side dupes, and Departure frequencies.
+      - Deterministic handling for:
+          * rollout / vacating runway
+          * post-landing taxi to gate
+          * departure ground taxi ("ready to taxi for departure runway ...")
     """
     phase = ctx.get("phase", "approach")
     runway_hint = ctx.get("runway", DEFAULT_RWY_PRIMARY)
-    callsign = ctx.get("callsign", "UNKNOWN")
+
+    # --- Callsign with repair ---
+    raw_cs = ctx.get("callsign", "UNKNOWN")
+    callsign = raw_cs
+
+    bogus = False
+    if isinstance(raw_cs, str):
+        u = raw_cs.upper().replace(" ", "")
+        if u.startswith("GATE") or u.startswith("RWY") or u.startswith("RUNWAY"):
+            bogus = True
+
+    if bogus or not raw_cs or raw_cs == "UNKNOWN":
+        inferred = _infer_callsign_from_text(LAST_PILOT_TEXT or dialogue)
+        if inferred:
+            callsign = inferred
+            ctx["callsign"] = inferred  # persist fix
+        else:
+            callsign = "UNKNOWN"
+
+    runway_hint = runway_hint or DEFAULT_RWY_PRIMARY
 
     # local no-op wrapper so we don't crash if _normalize_comm_freqs isn't present yet
     def _norm_comm_line(s, *, hdg=None, runway=None):
@@ -2670,28 +2839,93 @@ def gen_once(role, dialogue, ctx):
 
     # ---------------- Prompt ----------------
     if role == "ATC":
-        if is_ack_only(LAST_PILOT_TEXT):
-            atc_struct = ctx.get("_last_atc_struct")
-            if atc_struct and _pilot_covers_items(LAST_PILOT_TEXT, atc_struct):
-                out_line = f"{callsign}, readback correct."
-            else:
-                out_line = _ack_line(callsign)
+        pilot_low = (LAST_PILOT_TEXT or "").lower()
+
+        # 1) Hard-coded rollout behaviour so landing demos never go dead.
+        rollout_line = _maybe_rollout_handoff(callsign, LAST_PILOT_TEXT, runway_hint)
+        if rollout_line:
+            monitor_header("XAION SIM END (ROLL OUT)")
+            return rollout_line
+
+        # 2) Departure ground taxi request (Scenario 3)
+        #    e.g. "Greensboro Ground Delta 2230 at Gate 17 ready to taxi for departure runway 05 right"
+        if "ready to taxi" in pilot_low and "runway" in pilot_low and "gate" not in pilot_low:
+            # Extract runway from the pilot text if present
+            m_rw = re.search(r"runway\s+(\d{1,2}[lrc]?)", pilot_low)
+            dep_rw = (m_rw.group(1).upper() if m_rw else runway_hint or DEFAULT_RWY_PRIMARY)
+            core = f"taxi to Runway {dep_rw} via Alpha, Bravo, hold short of Runway 23L."
+            out_line = atc_prefix_and_dedup(callsign, core)
+            out_line = _normalize_tower_and_runway(out_line)
+            out_line = _norm_comm_line(
+                out_line,
+                hdg=ctx.get("assigned_hdg") or ctx.get("hdg_deg"),
+                runway=dep_rw,
+            )
+            monitor_header("XAION SIM END (VOICE CTX)")
+            return out_line
+
+        # 3) Gate taxi request (post-landing → gate)
+        if "request taxi" in pilot_low and "gate" in pilot_low:
+            m = re.search(r"gate\s+(\d+)", pilot_low)
+            gate = m.group(1) if m else "17"
+            core = f"taxi to Gate {gate} via Kilo, Bravo, hold short of Runway 23L."
+            out_line = atc_prefix_and_dedup(callsign, core)
+            out_line = _normalize_tower_and_runway(out_line)
+            out_line = _norm_comm_line(
+                out_line,
+                hdg=ctx.get("assigned_hdg") or ctx.get("hdg_deg"),
+                runway=runway_hint,
+            )
+            monitor_header("XAION SIM END (VOICE CTX)")
+            return out_line
+
+        # 4) ACK detection: is the last Pilot line essentially a readback?
+        ackish = is_ack_only(LAST_PILOT_TEXT)
+
+        # Treat clear readbacks like "AAL202 cleared to land runway 05 right"
+        # as acknowledgement even if they do not contain "roger / wilco".
+        if not ackish:
+            if (
+                ("cleared to land" in pilot_low and "runway" in pilot_low)
+                or ("cleared for takeoff" in pilot_low and "runway" in pilot_low)
+                or ("taxi to" in pilot_low and "runway" in pilot_low)
+            ):
+                if "request" not in pilot_low and "?" not in pilot_low:
+                    ackish = True
+
+        # rollout / exit + Ground readbacks also count as ACKs
+        if not ackish:
+            if (
+                ("exit via" in pilot_low or "exiting via" in pilot_low)
+                or ("contact ground" in pilot_low or "contacting ground" in pilot_low)
+            ):
+                if "request" not in pilot_low and "?" not in pilot_low:
+                    ackish = True
+
+        if ackish:
+            # For demo clarity we always say "readback correct."
+            out_line = f"{callsign}, readback correct."
             out_line = atc_prefix_and_dedup(callsign, out_line)
             out_line = _normalize_tower_and_runway(out_line)
             out_line = _norm_comm_line(
                 out_line,
                 hdg=ctx.get("assigned_hdg") or ctx.get("hdg_deg"),
-                runway=runway_hint
+                runway=runway_hint,
             )
             monitor_header("XAION SIM END (VOICE CTX)")
             return out_line
 
+        # 5) Normal ATC phase goals (when not ACK, not rollout, not gate/departure taxi)
         if phase == "ground":
-            phase_goal = ("Issue ONE specific taxi instruction with explicit route segments and HOLD SHORT. "
-                          "Authorize runway crossings only with 'CROSS Runway <id>'.")
+            phase_goal = (
+                "Issue ONE specific taxi instruction with explicit route segments and HOLD SHORT. "
+                "Authorize runway crossings only with 'CROSS Runway <id>'."
+            )
         elif phase == "approach":
-            phase_goal = ("Issue ONE concise vector/altitude/speed or approach clearance. "
-                          "If short final and runway clear, you may issue 'cleared to land'.")
+            phase_goal = (
+                "Issue ONE concise vector/altitude/speed or approach clearance. "
+                "If short final and runway clear, you may issue 'cleared to land'."
+            )
         else:
             phase_goal = "Issue ONE concise instruction or respond to the request."
 
@@ -2731,13 +2965,25 @@ Pilot: {callsign}, <readback>.
 
     # ---------------- LLM call ----------------
     try:
-        tok = phi4_tokenizer(base_prompt, return_tensors="pt",
-                             truncation=True, padding=True, max_length=1024).to(device)
+        tok = phi4_tokenizer(
+            base_prompt,
+            return_tensors="pt",
+            truncation=True,
+            padding=True,
+            max_length=1024,
+        ).to(device)
+
         out = phi4_model.generate(
-            tok.input_ids, attention_mask=tok.attention_mask,
-            max_new_tokens=80, do_sample=True, temperature=0.7, top_p=0.9,
-            repetition_penalty=1.08, no_repeat_ngram_size=3,
-            pad_token_id=phi4_tokenizer.eos_token_id, eos_token_id=phi4_tokenizer.eos_token_id,
+            tok.input_ids,
+            attention_mask=tok.attention_mask,
+            max_new_tokens=80,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.08,
+            no_repeat_ngram_size=3,
+            pad_token_id=phi4_tokenizer.eos_token_id,
+            eos_token_id=phi4_tokenizer.eos_token_id,
         )
         text = phi4_tokenizer.decode(out[0], skip_special_tokens=True)
         if f"{role}:" in text:
@@ -2785,11 +3031,16 @@ Pilot: {callsign}, <readback>.
         resp = _norm_comm_line(
             resp,
             hdg=ctx.get("assigned_hdg") or ctx.get("hdg_deg"),
-            runway=runway_hint
+            runway=runway_hint,
         )
 
         monitor_header("XAION SIM END (VOICE CTX)")
         return resp
+    else:
+        # Pilot side: just return the cleaned response
+        monitor_header("XAION SIM END (VOICE CTX)")
+        return resp
+
 
     # ---------- PILOT path ----------
     # Canonicalize first (ensures 'Pilot: CS, ...' and trims placeholders)
@@ -4065,9 +4316,7 @@ def single_handoff(comm_type: str, scenario_text: str):
     monitor_header("XAION SIM END (SINGLE HANDOFF)")
 
 
-# ===============================
-# XAION_CONTROL_ST_V56.py — Part 3/3
-# Unified run handler + Gradio UI (Pilot transcript visible only in Vocal Input)
+
 # ===============================
 
 # -------------------------------
