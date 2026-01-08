@@ -1,6 +1,5 @@
 # ===============================
-# XAION_CONTROL_ST_main
-# Foundations: config, models, helpers, parsing, scenarios
+# XAION_CONTROL_ST_main.py
 # ===============================
 
 import os, gc, re, ast, math, time, socket, tempfile, uuid, wave, random
@@ -256,7 +255,9 @@ KGSO_DEP_FREQ_B = "126.6"   # sectors 050–249
 # Helpers / parsing / gates
 # -------------------------------
 # -----------------------
-
+# XAION: Runway/Phase heuristics + anomaly detectors + monitor payload
+# Paste this block after your imports near the top of XAION_CONTROL_fullscript.py
+# -----------------------
 # -----------------------
 # XAION: Runway loader + LLM monitor (full implementations)
 # Paste after your imports and existing helper functions
@@ -268,7 +269,9 @@ KGSO_DEP_FREQ_B = "126.6"   # sectors 050–249
 
 def _infer_callsign_from_text(text: str | None) -> str | None:
     """
-
+    Best-effort callsign inference from raw transcript text.
+    Tries structured formats first (AAL202, UAL451, DAL2230, N123AB),
+    then brand-name + digits (Delta 2230 -> DAL2230, etc.).
     """
     if not text:
         return None
@@ -372,7 +375,10 @@ def repair_transcript_with_llm(
     rag_snippets: str | None = None,
 ) -> str:
     """
-
+    Use the Phi-4 ATC model as a transcript corrector.
+    Input: noisy ASR from Whisper.
+    Output: a single clean pilot line (no headings, no explanations).
+    If we can't get a trustworthy line, we fall back to the raw ASR text.
     """
     raw_text = (raw_text or "").strip()
     if not raw_text:
@@ -472,7 +478,10 @@ XAION_RUNWAYS = list(_DEFAULT_XAION_RUNWAYS)  # global runtime list
 
 def set_xaion_runways(runways: List[Dict]):
     """
-
+    Replace the in-memory XAION_RUNWAYS with a provided list of runway dicts.
+    Each runway dict must contain keys: 'id', 'lat', 'lon', 'true_heading'.
+    Example:
+        set_xaion_runways([{'id':'05','lat':36.1,'lon':-79.93,'true_heading':52.0}, ...])
     """
     global XAION_RUNWAYS
     safe = []
@@ -743,7 +752,8 @@ def haversine_nm(lat1, lon1, lat2, lon2):
     return nm
 
 # -----------------------
-
+# Small runway DB for KGSO (replace with authoritative coords)
+# Each runway: {'id':'05/23', 'lat':..., 'lon':..., 'true_heading':...}
 # -----------------------
 XAION_RUNWAYS = [
     # KGSO runways (example coords — replace with exact ones)
@@ -1217,7 +1227,14 @@ _TWR_119_RX = re.compile(r'(?i)\b(contact(?:ing)?|switch(?:ing)?)\s+(?:the\s+)?t
 _MUST_CONTAIN = {
     "contact_tower": ("contact", "tower"),
     "cleared_tkof": ("cleared", "takeoff"),
+
+    # NEW: for “line up and wait” enforcement
+    "luaw": ("line", "wait"),
+
+    # NEW: for departure handoff enforcement (used later in Scenario 4)
+    "contact_dep": ("contact", "departure"),
 }
+
 
 # --- Normalizers (replace your current defs) ---
 _TWR_119_CMD_RX  = re.compile(r'(?i)\b(contact(?:ing)?|switch(?:ing)?)\s+(?:the\s+)?tower\s+119\b')
@@ -1648,7 +1665,11 @@ def _ack_line(cs: str) -> str:
     except Exception:
         return f"Roger, {cs}."
 
-_BAD_CS = {"", "NONE", "UNKNOWN", "NULL", "nan", "None"}
+_BAD_CS = {
+    "", "NONE", "UNKNOWN", "NULL", "NAN",
+    "GSO", "KGSO",
+    "GROUND", "TOWER", "TWR", "APPROACH", "DEPARTURE",
+}
 
 def _safe_callsign_from_row(r) -> str:
     for k in ("display_id", "ident", "Flight Number", "Callsign", "Call Sign", "Aircraft Registration", "Hex", "hex"):
@@ -2133,7 +2154,45 @@ SPD_RX      = re.compile(r"\b(\d{1,3})\s*(?:knots|kts|kt)\b", re.I)
 DIST_RX     = re.compile(r"\b(\d+(?:\.\d+)?)\s*(?:nm|nautical\s*miles?|miles?|mile|dme)\b", re.I)
 HDG_RX      = re.compile(r"\b(?:heading|hdg)\s*(\d{1,3})\b", re.I)
 
-def _normalize_callsign(s: str) -> str: return re.sub(r"[\s\.\,\-]+", "", s.upper())
+# Mapping spoken airline names to ICAO-ish callsigns before we parse them
+AIRLINE_WORD_RX = re.compile(
+    r"\b(DELTA|UNITED|AMERICAN)\s+(\d{2,4})\b",
+    re.I,
+)
+AIRLINE_WORD_MAP = {
+    "DELTA": "DAL",
+    "UNITED": "UAL",
+    "AMERICAN": "AAL",
+}
+
+
+def _normalize_callsign(raw: str) -> str:
+    """
+    Turn a raw token from the transcript into a plausible callsign.
+
+    - Strip punctuation/whitespace.
+    - Reject obvious non-callsigns like GATE17, RUNWAY05R, GROUND, etc.
+    """
+    if not raw:
+        return ""
+
+    s = re.sub(r"[^A-Za-z0-9]", "", str(raw)).upper()
+
+    # Too short to be useful
+    if len(s) < 3:
+        return ""
+
+    # Filter out gate / runway artifacts like 'GATE17', 'RUNWAY05R'
+    if s.startswith("GATE") and re.search(r"\d+$", s):
+        return ""
+    if s.startswith("RUNWAY") or s.startswith("RWY"):
+        return ""
+
+    if s in _BAD_CS:
+        return ""
+
+    return s
+
 def _normalize_ils(text: str) -> str:
     text = re.sub(r"\bI[\s\.\-]*L[\s\.\-]*S\b", "ILS", text, flags=re.I)
     text = re.sub(r"(?:\s*\.\s*){2,}", " ", text)
@@ -2144,7 +2203,31 @@ def _normalize_ack(text: str) -> str:
     t = re.sub(r"\bcopy that\b", "copy", t, flags=re.I)
     t = re.sub(r"^(roger|wilco|copy|affirmative)\b", lambda m: m.group(1).capitalize(), t, flags=re.I)
     return t
-def _join_callsign_chunks(text: str) -> str: return CALLSIGN_CHUNK_JOINERS.sub(lambda m: f"{m.group(1).upper()}{m.group(2)}", text)
+# def _join_callsign_chunks(text: str) -> str: return CALLSIGN_CHUNK_JOINERS.sub(lambda m: f"{m.group(1).upper()}{m.group(2)}", text)
+def _join_callsign_chunks(t: str) -> str:
+    """
+    Normalize things like:
+      'Delta 2230'   -> 'DAL2230'
+      'United 451'   -> 'UAL451'
+      'American 202' -> 'AAL202'
+    and also join compact forms like 'DAL 2230'.
+    """
+
+    def airline_repl(m: re.Match) -> str:
+        word = m.group(1).upper()
+        num = m.group(2)
+        prefix = AIRLINE_WORD_MAP.get(word, word[:3])
+        return f"{prefix}{num}"
+
+    # First, collapse "Delta 2230" / "United 451" / "American 202"
+    t = AIRLINE_WORD_RX.sub(airline_repl, t)
+
+    # Then, handle existing patterns like "DAL 2230", "UAL flight 451", etc.
+    def chunk_repl(m: re.Match) -> str:
+        return f"{m.group(1)}{m.group(2)}"
+
+    return CALLSIGN_CHUNK_JOINERS.sub(chunk_repl, t)
+
 
 def normalize_transcript(text: str) -> str:
     if not text: return ""
@@ -2578,7 +2661,9 @@ def _first_open_port(preferred: int, tries: int = 6):
             except OSError:
                 continue
     return preferred
+# ===============================
 
+# State machine, validators, generators, voice/full-sim runners
 # ===============================
 
 # -------------------------------
@@ -2773,6 +2858,47 @@ def guard_or_tower(cs: str | None, runway: str | None):
 
 
 
+def synthesize_readback_from_atc(last_atc: str, callsign: str) -> str:
+    """
+    Build a simple Pilot readback from the last ATC transmission.
+
+    - Strips UI wrappers and 'This is XAION CONTROL.'
+    - Removes leading ATC callsign if present.
+    - Returns: 'Pilot: {callsign}, <core instruction>' or '' if we can't extract anything.
+    """
+    if not last_atc:
+        return ""
+
+    # Remove any leading 'ATC:' label
+    core = re.sub(r"^\s*ATC:\s*", "", last_atc).strip()
+
+    # Use your existing helper to strip 'This is XAION CONTROL.' etc.
+    try:
+        core = strip_atc_ui_to_core(core, callsign)
+    except NameError:
+        # If helper isn't defined for some reason, just fall back to the raw text
+        pass
+
+    core = core.strip(" .,")
+
+    if not core:
+        return ""
+
+    # Ensure we don't accidentally prepend callsign twice
+    # e.g., if core already starts with 'DAL2230,'
+    if core.upper().startswith(callsign.upper()):
+        # e.g. 'DAL2230, taxi to Runway 05R via Alpha, Bravo, hold short of Runway 23L.'
+        # -> strip the leading callsign so we can standardize the Pilot prefix.
+        core = re.sub(
+            rf"^\s*{re.escape(callsign)}\s*,\s*",
+            "",
+            core,
+            flags=re.IGNORECASE,
+        ).strip()
+
+    return f"Pilot: {callsign}, {core}"
+
+
 # -------------------------------
 # Role generators (ATC/Pilot with validators)
 # -------------------------------
@@ -2785,33 +2911,10 @@ def gen_once(role, dialogue, ctx):
       - Pilot fallback: synthesize a full readback from the last ATC when the LLM under-performs
         or tries to ask 'say again'.
       - Normalizes Tower frequency, runway side dupes, and Departure frequencies.
-      - Deterministic handling for:
-          * rollout / vacating runway
-          * post-landing taxi to gate
-          * departure ground taxi ("ready to taxi for departure runway ...")
     """
     phase = ctx.get("phase", "approach")
     runway_hint = ctx.get("runway", DEFAULT_RWY_PRIMARY)
-
-    # --- Callsign with repair ---
-    raw_cs = ctx.get("callsign", "UNKNOWN")
-    callsign = raw_cs
-
-    bogus = False
-    if isinstance(raw_cs, str):
-        u = raw_cs.upper().replace(" ", "")
-        if u.startswith("GATE") or u.startswith("RWY") or u.startswith("RUNWAY"):
-            bogus = True
-
-    if bogus or not raw_cs or raw_cs == "UNKNOWN":
-        inferred = _infer_callsign_from_text(LAST_PILOT_TEXT or dialogue)
-        if inferred:
-            callsign = inferred
-            ctx["callsign"] = inferred  # persist fix
-        else:
-            callsign = "UNKNOWN"
-
-    runway_hint = runway_hint or DEFAULT_RWY_PRIMARY
+    callsign = ctx.get("callsign", "UNKNOWN")
 
     # local no-op wrapper so we don't crash if _normalize_comm_freqs isn't present yet
     def _norm_comm_line(s, *, hdg=None, runway=None):
@@ -2839,48 +2942,11 @@ def gen_once(role, dialogue, ctx):
 
     # ---------------- Prompt ----------------
     if role == "ATC":
-        pilot_low = (LAST_PILOT_TEXT or "").lower()
+        last_pilot_raw = LAST_PILOT_TEXT or ""
+        pilot_low = last_pilot_raw.lower()
 
-        # 1) Hard-coded rollout behaviour so landing demos never go dead.
-        rollout_line = _maybe_rollout_handoff(callsign, LAST_PILOT_TEXT, runway_hint)
-        if rollout_line:
-            monitor_header("XAION SIM END (ROLL OUT)")
-            return rollout_line
-
-        # 2) Departure ground taxi request (Scenario 3)
-        #    e.g. "Greensboro Ground Delta 2230 at Gate 17 ready to taxi for departure runway 05 right"
-        if "ready to taxi" in pilot_low and "runway" in pilot_low and "gate" not in pilot_low:
-            # Extract runway from the pilot text if present
-            m_rw = re.search(r"runway\s+(\d{1,2}[lrc]?)", pilot_low)
-            dep_rw = (m_rw.group(1).upper() if m_rw else runway_hint or DEFAULT_RWY_PRIMARY)
-            core = f"taxi to Runway {dep_rw} via Alpha, Bravo, hold short of Runway 23L."
-            out_line = atc_prefix_and_dedup(callsign, core)
-            out_line = _normalize_tower_and_runway(out_line)
-            out_line = _norm_comm_line(
-                out_line,
-                hdg=ctx.get("assigned_hdg") or ctx.get("hdg_deg"),
-                runway=dep_rw,
-            )
-            monitor_header("XAION SIM END (VOICE CTX)")
-            return out_line
-
-        # 3) Gate taxi request (post-landing → gate)
-        if "request taxi" in pilot_low and "gate" in pilot_low:
-            m = re.search(r"gate\s+(\d+)", pilot_low)
-            gate = m.group(1) if m else "17"
-            core = f"taxi to Gate {gate} via Kilo, Bravo, hold short of Runway 23L."
-            out_line = atc_prefix_and_dedup(callsign, core)
-            out_line = _normalize_tower_and_runway(out_line)
-            out_line = _norm_comm_line(
-                out_line,
-                hdg=ctx.get("assigned_hdg") or ctx.get("hdg_deg"),
-                runway=runway_hint,
-            )
-            monitor_header("XAION SIM END (VOICE CTX)")
-            return out_line
-
-        # 4) ACK detection: is the last Pilot line essentially a readback?
-        ackish = is_ack_only(LAST_PILOT_TEXT)
+        # Decide if the last Pilot line was essentially a readback (no new request)
+        ackish = is_ack_only(last_pilot_raw)
 
         # Treat clear readbacks like "AAL202 cleared to land runway 05 right"
         # as acknowledgement even if they do not contain "roger / wilco".
@@ -2893,18 +2959,12 @@ def gen_once(role, dialogue, ctx):
                 if "request" not in pilot_low and "?" not in pilot_low:
                     ackish = True
 
-        # rollout / exit + Ground readbacks also count as ACKs
-        if not ackish:
-            if (
-                ("exit via" in pilot_low or "exiting via" in pilot_low)
-                or ("contact ground" in pilot_low or "contacting ground" in pilot_low)
-            ):
-                if "request" not in pilot_low and "?" not in pilot_low:
-                    ackish = True
-
         if ackish:
-            # For demo clarity we always say "readback correct."
-            out_line = f"{callsign}, readback correct."
+            atc_struct = ctx.get("_last_atc_struct")
+            if atc_struct and _pilot_covers_items(last_pilot_raw, atc_struct):
+                out_line = f"{callsign}, readback correct."
+            else:
+                out_line = _ack_line(callsign)
             out_line = atc_prefix_and_dedup(callsign, out_line)
             out_line = _normalize_tower_and_runway(out_line)
             out_line = _norm_comm_line(
@@ -2915,13 +2975,51 @@ def gen_once(role, dialogue, ctx):
             monitor_header("XAION SIM END (VOICE CTX)")
             return out_line
 
-        # 5) Normal ATC phase goals (when not ACK, not rollout, not gate/departure taxi)
-        if phase == "ground":
+        # Special-case: approaching runway and holding short -> CROSS clearance.
+        last_pilot_low = (LAST_PILOT_TEXT or "").lower()
+        if ("approaching runway" in last_pilot_low
+                and "holding short" in last_pilot_low):
+            # If we previously issued a HOLD SHORT for some runway, CROSS that one.
+            atc_struct = ctx.get("_last_atc_struct") or {}
+            hs_list = atc_struct.get("hold_short") or []
+            cross_rwy = hs_list[0] if hs_list else "23L"
+            core = (
+                f"cross Runway {cross_rwy}, then taxi to Runway {runway_hint}, "
+                f"hold short."
+            )
+            out_line = atc_prefix_and_dedup(callsign, core)
+            out_line = _normalize_tower_and_runway(out_line)
+            out_line = _norm_comm_line(
+                out_line,
+                hdg=ctx.get("assigned_hdg") or ctx.get("hdg_deg"),
+                runway=runway_hint,
+            )
+            monitor_header("XAION SIM END (GROUND CROSS)")
+            return out_line
+
+        # Special: rollout / vacating runway cue from Pilot → exit + Ground handoff
+        rollout_cue = (
+            "rolling out" in pilot_low
+            or "roll out" in pilot_low
+            or ("clear of" in pilot_low and "runway" in pilot_low)
+            or ("vacated" in pilot_low and "runway" in pilot_low)
+        )
+
+        if rollout_cue:
             phase_goal = (
-                "Issue ONE specific taxi instruction with explicit route segments and HOLD SHORT. "
-                "Authorize runway crossings only with 'CROSS Runway <id>'."
+                "Pilot has just landed and is rolling out / vacating the runway. "
+                "Issue ONE concise instruction that tells them where to exit "
+                "(e.g., 'exit when able via Kilo') and a handoff to Ground with "
+                "frequency. Do NOT give new approach vectors or go-around here."
+            )
+        elif phase == "ground":
+            phase_goal = (
+                "Issue ONE specific taxi instruction with explicit route segments "
+                "and HOLD SHORT. Authorize runway crossings only with "
+                "'CROSS Runway <id>'."
             )
         elif phase == "approach":
+            # Normal approach work; on short final + runway clear you may issue 'cleared to land'.
             phase_goal = (
                 "Issue ONE concise vector/altitude/speed or approach clearance. "
                 "If short final and runway clear, you may issue 'cleared to land'."
@@ -2972,7 +3070,6 @@ Pilot: {callsign}, <readback>.
             padding=True,
             max_length=1024,
         ).to(device)
-
         out = phi4_model.generate(
             tok.input_ids,
             attention_mask=tok.attention_mask,
@@ -2995,7 +3092,9 @@ Pilot: {callsign}, <readback>.
 
     # ---------------- Sanitize ----------------
     text_nowx = strip_weather_clauses(text_raw)
-    resp = clean_response(text_nowx, phase=phase, runway_hint=runway_hint, callsign=callsign)
+    resp = clean_response(
+        text_nowx, phase=phase, runway_hint=runway_hint, callsign=callsign
+    )
     resp = _anti_template(_strip_role_leaks(resp))
     resp = _strip_control_artifacts(resp, callsign)
     resp = _normalize_tower_and_runway(resp)
@@ -3003,7 +3102,12 @@ Pilot: {callsign}, <readback>.
     # ---------------- Role-specific repairs ----------------
     if role == "ATC":
         # Under-output / template echo guard
-        body = re.sub(rf"^\s*{re.escape(callsign)}\s*,\s*", "", resp, flags=re.I).strip()
+        body = re.sub(
+            rf"^\s*{re.escape(callsign)}\s*,\s*",
+            "",
+            resp,
+            flags=re.I,
+        ).strip()
         if len(body) < 6 or re.search(r"[<>]|(?i)instruction here", resp):
             resp = _safe_atc(callsign, phase, runway_hint)
 
@@ -3024,7 +3128,9 @@ Pilot: {callsign}, <readback>.
 
         # Final minimal guard
         if len(resp) < 8:
-            resp = atc_prefix_and_dedup(callsign, _safe_atc(callsign, phase, runway_hint))
+            resp = atc_prefix_and_dedup(
+                callsign, _safe_atc(callsign, phase, runway_hint)
+            )
 
         # Final normalize (Tower, Runway, and Departure frequencies)
         resp = _normalize_tower_and_runway(resp)
@@ -3036,10 +3142,11 @@ Pilot: {callsign}, <readback>.
 
         monitor_header("XAION SIM END (VOICE CTX)")
         return resp
-    else:
-        # Pilot side: just return the cleaned response
-        monitor_header("XAION SIM END (VOICE CTX)")
-        return resp
+
+    # Pilot branch: nothing fancy beyond what the instruction + LLM already do.
+    # (Readback validation happens elsewhere using _extract_items + _pilot_covers_items.)
+    monitor_header("XAION SIM END (VOICE CTX)")
+    return resp
 
 
     # ---------- PILOT path ----------
@@ -3368,94 +3475,266 @@ LINEUP_RX       = re.compile(r"\b(line\s*up(?:\s*and\s*wait)?|luaw)\b.*\brunway\
 PILOT_ASSERT_TKOF_RX = re.compile(r"\bcleared\s+for\s+takeoff\b", re.I)
 
 # --- Vocal Input progression helpers (ground) ---
-# --- Vocal Input progression helpers (ground) ---
 def _vocal_ground_flow(cs: str, ctx: dict, pilot_text: str, dialogue: str) -> str | None:
     """
-    For Vocal Input only: detect ground milestones and emit ONE ATC line,
-    phrased by the LLM, that advances toward takeoff.
-    Returns a fully-branded ATC UI block (1–2 lines), or None to fall back.
+    Deterministic ground-side ladder for Vocal Input.
+
+    Scenario 3:
+      Gate push -> Taxi with HOLD SHORT (23L) + CROSS (23L) to destination runway 05R
+      with readback validation.
+
+    Scenario 4:
+      Tower: Hold short/ready -> LUAW -> Cleared for takeoff -> Departure handoff
     """
-    rw = ctx.get("runway") or DEFAULT_RWY_PRIMARY
-    st = CALLSTATE.setdefault(cs, {"phase": "ground", "runway": rw, "stage": None, "gate": ctx.get("gate")})
+    import re
 
-    # Regex (module-level too, but keep here for clarity if imported standalone)
-    READY_RX        = re.compile(r"\b(holding\s+short\s+runway\s*(\d{2}[LRC]?)\b.*\bready\b|ready\s+(?:for\s+)?(?:departure|takeoff))", re.I)
-    CONTACT_TWR_RX  = re.compile(r"\b(contact(?:ing)?|switch(?:ing)?(?:\s*to)?)\s*(?:tower|\b119\.1\b)\b", re.I)
-    LINEUP_RX       = re.compile(r"\b(?:line\s*up(?:\s*and\s*wait)?|luaw)\b.*\brunway\s*(\d{2}[LRC]?)\b", re.I)
-    PILOT_ASSERT_TKOF_RX = re.compile(r"\bcleared\s+for\s+takeoff\b", re.I)
+    pt = normalize_transcript(pilot_text or "")
+    low = pt.lower()
+    dlg_low = (dialogue or "").lower()
 
-    # 1) Pilot requests taxi -> taxi + HOLD SHORT
-    if REQ_TAXI_RX.search(pilot_text):
-        atc_core = _compose_taxi_to_runway(cs, rw, st.get("gate"))
-        core = llm_style_atc_from_core(cs, atc_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-        core = _normalize_tower_and_runway(core)
-        st.update(stage="taxi_issued")
-        return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}"
+    # ---------- Local helpers ----------
+    def _atc(core_suffix: str) -> str:
+        core_suffix = (core_suffix or "").strip()
+        if not core_suffix:
+            core_suffix = "say again."
+        return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core_suffix}"
 
-    # 2) Holding short & ready OR LUAW BEFORE handoff -> hand off to Tower
-    if (READY_RX.search(pilot_text) or LINEUP_RX.search(pilot_text)) and st.get("stage") in (None, "taxi_issued"):
-        atc_core = f"{cs}, contact Tower {KGSO_TOWER_FREQ}."
-        core = llm_style_atc_from_core(cs, atc_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-        core = _normalize_tower_and_runway(core)
-        core = _require_tokens_or_fallback(core, _MUST_CONTAIN["contact_tower"], atc_core)
-        st.update(stage="handoff_twr")
-        return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}"
+    def _parse_explicit_runway_from_text(text: str) -> str:
+        """
+        Parse 'runway 05 right' / 'runway 23 L' / 'runway 05R' -> '05R' / '23L'
+        Returns '' if not found.
+        """
+        if not text:
+            return ""
+        m = re.search(r"(?i)\brunway\s*(\d{2})\s*(left|right|center|[lrc])?\b", text)
+        if not m:
+            return ""
+        num = m.group(1)
+        suf = (m.group(2) or "").strip().lower()
+        if suf in ("left", "l"):
+            return f"{num}L"
+        if suf in ("right", "r"):
+            return f"{num}R"
+        if suf in ("center", "c"):
+            return f"{num}C"
+        return f"{num}"
 
-    # 2b) AFTER handoff, any new READY / LUAW -> issue TAKEOFF CLEARANCE
-    if (READY_RX.search(pilot_text) or LINEUP_RX.search(pilot_text)) and st.get("stage") == "handoff_twr":
-        atc_core = f"{cs}, cleared for takeoff Runway {rw}."
-        core = llm_style_atc_from_core(cs, atc_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-        core = _normalize_tower_and_runway(core)
-        core = _require_tokens_or_fallback(core, _MUST_CONTAIN["cleared_tkof"], atc_core)
-        st.update(stage="cleared_takeoff")
-        # Optional immediate Departure handoff:
+    def _mentions_runway(runway_code: str) -> bool:
+        """
+        True if pilot text mentions runway_code allowing:
+          - spaces: '23L' == '23 L'
+          - words:  '23L' == '23 left' / 'runway 23 left'
+        """
+        if not runway_code:
+            return False
+        rc = runway_code.upper().strip()
+
+        m = re.match(r"^(\d{2})([LRC])$", rc)
+        if m:
+            num, suf = m.group(1), m.group(2)
+
+            # 1) Letter form: "23L" or "23 L"
+            if re.search(rf"(?i)\b{num}\s*{suf}\b", pt):
+                return True
+
+            # 2) Word form: "23 left/right/center"
+            word = {"L": "left", "R": "right", "C": "center"}.get(suf, "")
+            if word and re.search(rf"(?i)\b{num}\s*{word}\b", pt):
+                return True
+
+            # 3) Also allow "runway 23 left" (explicit runway phrase)
+            if word and re.search(rf"(?i)\brunway\s*{num}\s*{word}\b", pt):
+                return True
+
+            return False
+
+        digs = re.sub(r"[^0-9]", "", rc)
+        if digs:
+            return bool(re.search(rf"(?i)\b{digs}\b", pt))
+        return False
+
+    # ---------- Addressing detection ----------
+    TOWER_ADDR_RX  = re.compile(r"(?i)\b(greensboro\s+tower|tower)\b")
+    SWITCH_TWR_RX  = re.compile(r"(?i)\b(contact(?:ing)?|switch(?:ing)?(?:\s+to)?)\s+(?:the\s+)?(?:greensboro\s+)?tower\b")
+    on_tower = bool(TOWER_ADDR_RX.search(pt)) and not bool(SWITCH_TWR_RX.search(pt))
+
+    GND_ADDR_RX    = re.compile(r"(?i)\b(greensboro\s+ground|ground)\b")
+    SWITCH_GND_RX  = re.compile(r"(?i)\b(contact(?:ing)?|switch(?:ing)?(?:\s+to)?)\s+(?:the\s+)?(?:greensboro\s+)?ground\b")
+    on_ground = bool(GND_ADDR_RX.search(pt)) and not bool(SWITCH_GND_RX.search(pt))
+
+    # ---------- Cues ----------
+    REQ_TAXI_RX = re.compile(r"(?i)\b(request\s+taxi|ready\s+to\s+taxi|taxi\s+for\s+departure|taxi\s+to)\b")
+    GATE_CUE_RX = re.compile(r"(?i)\b(gate|at\s+gate|ramp|push)\b")
+    READY_RX    = re.compile(r"(?i)\b(ready\s+for\s+departure|ready\s+for\s+takeoff|holding\s+short|hold\s+short|ready)\b")
+
+    LUAW_RX     = re.compile(r"(?i)\b(line\s*up(?:\s*and\s*wait)?|luaw)\b")
+    LINED_UP_RX = re.compile(r"(?i)\b(lined\s+up|in\s+position|position\s+and\s+hold|waiting)\b")
+    TKOF_RX     = re.compile(r"(?i)\b(cleared\s+for\s+takeoff)\b")
+    AIRBORNE_RX = re.compile(r"(?i)\b(airborne|off\s+runway|positive\s+rate|up\s+and\s+away)\b")
+    PILOT_ASSERT_TKOF_RX = re.compile(r"(?i)\b(rolling|taking\s+off|departing)\b")
+    ATTEMPTED_TAXI_RB_RX = re.compile(r"(?i)\b(taxi|via|alpha|bravo)\b")
+
+    gate_cue = bool(GATE_CUE_RX.search(pt))
+    taxi_req = bool(REQ_TAXI_RX.search(pt))
+
+    # ---------- Determine runway (but keep destination sticky once taxi issued) ----------
+    rw_ctx = normalize_lr(ctx.get("runway") or DEFAULT_RWY_PRIMARY, ctx.get("gate"), cs)
+    st = CALLSTATE.setdefault(cs, {"phase": "ground", "runway": rw_ctx, "stage": None, "gate": ctx.get("gate")})
+    st["phase"] = "ground"
+
+    # HARD RESET into taxi flow if pilot is on Ground/at Gate and requesting taxi
+    # Prevents Scenario 4 tower stages from hijacking Scenario 3 taxi starts (same callsign).
+    if taxi_req and (on_ground or gate_cue or "ground" in dlg_low):
+        st["stage"] = None
+        st.pop("luaw_rb_ok", None)
+        st.pop("tkof_rb_ok", None)
+        st.pop("taxi_rb_ok", None)
+        st.pop("cross_rb_ok", None)
+        st.pop("handoff_done", None)
+        st.pop("dest_runway", None)
+        st.pop("taxi_hs_rwy", None)
+
+    stage = st.get("stage")
+
+    # Destination runway becomes sticky once taxi is issued
+    dest_rw = (st.get("dest_runway") or rw_ctx or DEFAULT_RWY_PRIMARY or "").upper().strip()
+    if not dest_rw:
+        dest_rw = (DEFAULT_RWY_PRIMARY or "05R").upper().strip()
+
+    # If pilot explicitly said runway (e.g., "05 right"), trust that ONLY if we don't already have a sticky dest.
+    explicit_rw = ""
+    if not st.get("dest_runway"):
+        explicit_rw = _parse_explicit_runway_from_text(pt)
+        if explicit_rw:
+            # if they said just "05", and default is 05R, lock to default
+            if re.match(r"^\d{2}$", explicit_rw):
+                d = (DEFAULT_RWY_PRIMARY or "").upper()
+                if d.startswith(explicit_rw):
+                    explicit_rw = d
+            dest_rw = explicit_rw.upper().strip()
+
+    # Scenario 3: if destination is 05R, hold-short runway is 23L
+    if (dest_rw or "").upper() == "05R" and not st.get("taxi_hs_rwy"):
+        st["taxi_hs_rwy"] = "23L"
+    hs_rwy = (st.get("taxi_hs_rwy") or "").strip().upper()  # "23L" or ""
+
+    # Helper flags for "approaching hold short runway"
+    approaching = ("approaching" in low) or ("approach" in low) or ("near" in low)
+    holding = ("hold short" in low) or ("holding short" in low)
+    explicit_here = _parse_explicit_runway_from_text(pt)  # catches "runway 23 left" -> "23L"
+    at_hs_point = bool(hs_rwy) and approaching and holding and (_mentions_runway(hs_rwy) or (explicit_here.upper() == hs_rwy))
+
+    # ---------- Scenario 4: airborne -> departure handoff ----------
+    if stage == "cleared_takeoff" and AIRBORNE_RX.search(low):
         handoff_core = _maybe_departure_handoff(cs, st)
         if handoff_core:
-            hand_core = llm_style_atc_from_core(cs, handoff_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-            hand_core = _normalize_tower_and_runway(hand_core)
-            hand_ui = f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{hand_core}"
-            return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}\n{hand_ui}"
-        return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}"
+            s = (handoff_core or "").strip()
+            if "," in s:
+                left, right = s.split(",", 1)
+                if re.sub(r"[^A-Z0-9]", "", left.upper()) == re.sub(r"[^A-Z0-9]", "", cs.upper()):
+                    s = right.strip()
+            s = _normalize_tower_and_runway(s)
+            st["stage"] = "handoff_dep"
+            return _atc(s)
+        return None
 
-    # 3) Pilot says 'switching/contacting Tower' -> cleared for takeoff
-    if CONTACT_TWR_RX.search(pilot_text) and st.get("stage") in ("handoff_twr", "taxi_issued"):
-        atc_core = f"{cs}, cleared for takeoff Runway {rw}."
-        core = llm_style_atc_from_core(cs, atc_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-        core = _normalize_tower_and_runway(core)
-        core = _require_tokens_or_fallback(core, _MUST_CONTAIN["cleared_tkof"], atc_core)
-        st.update(stage="cleared_takeoff")
-        handoff_core = _maybe_departure_handoff(cs, st)
-        if handoff_core:
-            hand_core = llm_style_atc_from_core(cs, handoff_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-            hand_core = _normalize_tower_and_runway(hand_core)
-            hand_ui = f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{hand_core}"
-            return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}\n{hand_ui}"
-        return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}"
+    # ---------- Scenario 3: taxi issuance ----------
+    if taxi_req and not on_tower and (on_ground or gate_cue or "ground" in dlg_low):
+        st["dest_runway"] = (dest_rw or rw_ctx or DEFAULT_RWY_PRIMARY or "05R").upper().strip()
+        dest_rw = st["dest_runway"]
 
-    # 4) Pilot prematurely says "cleared for takeoff"
-    if PILOT_ASSERT_TKOF_RX.search(pilot_text):
-        if st.get("stage") == "handoff_twr":
-            atc_core = f"{cs}, cleared for takeoff Runway {rw}."
-            core = llm_style_atc_from_core(cs, atc_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-            core = _normalize_tower_and_runway(core)
-            core = _require_tokens_or_fallback(core, _MUST_CONTAIN["cleared_tkof"], atc_core)
-            st.update(stage="cleared_takeoff")
-            handoff_core = _maybe_departure_handoff(cs, st)
-            if handoff_core:
-                hand_core = llm_style_atc_from_core(cs, handoff_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-                hand_core = _normalize_tower_and_runway(hand_core)
-                hand_ui = f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{hand_core}"
-                return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}\n{hand_ui}"
-            return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}"
+        if dest_rw == "05R" and hs_rwy:
+            atc_suffix = f"taxi to Runway {dest_rw} via Alpha, Bravo, hold short of Runway {hs_rwy}."
         else:
-            atc_core = f"{cs}, contact Tower {KGSO_TOWER_FREQ}."
-            core = llm_style_atc_from_core(cs, atc_core, dialogue, {"phase": "ground", "runway": rw, "callsign": cs})
-            core = _normalize_tower_and_runway(core)
-            core = _require_tokens_or_fallback(core, _MUST_CONTAIN["contact_tower"], atc_core)
-            st.update(stage="handoff_twr")
-            return f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}"
+            atc_suffix = f"taxi to Runway {dest_rw} via Alpha, hold short Runway {dest_rw}."
+
+        st["stage"] = "taxi_issued"
+        st["taxi_rb_ok"] = False
+        return _atc(_normalize_tower_and_runway(atc_suffix))
+
+    # ---------- Scenario 3: taxi readback validation ----------
+    if stage == "taxi_issued" and not on_tower and hs_rwy and ATTEMPTED_TAXI_RB_RX.search(pt):
+        has_hold_short = ("hold short" in low) or ("holding short" in low)
+        has_hs_rwy = _mentions_runway(hs_rwy) or (explicit_here.upper() == hs_rwy)
+        if has_hold_short and has_hs_rwy:
+            st["taxi_rb_ok"] = True
+            return _atc("readback correct.")
+        return _atc(f"say again with hold short of Runway {hs_rwy}.")
+
+    # ---------- Scenario 3: approaching hold-short runway -> CROSS clearance ----------
+    if hs_rwy and not on_tower and stage in ("taxi_issued", "taxi_after_cross", None):
+        if at_hs_point:
+            dest_rw = (st.get("dest_runway") or dest_rw or rw_ctx or DEFAULT_RWY_PRIMARY or "05R").upper().strip()
+            if _runway_is_free(hs_rwy):
+                st["stage"] = "cross_issued"
+                atc_suffix = f"cross Runway {hs_rwy}, then taxi to Runway {dest_rw}, hold short."
+                return _atc(_normalize_tower_and_runway(atc_suffix))
+            else:
+                st["stage"] = "taxi_issued"
+                return _atc(f"hold short Runway {hs_rwy}.")
+
+    # ---------- Scenario 3: CROSS readback validation ----------
+    if stage == "cross_issued" and hs_rwy and not on_tower:
+        if ("cross" in low) and (_mentions_runway(hs_rwy) or (explicit_here.upper() == hs_rwy)):
+            st["cross_rb_ok"] = True
+            st["stage"] = "taxi_after_cross"
+            return _atc("readback correct.")
+        return None
+
+    # ---------- Scenario 4: ready -> contact tower (but don't steal taxi hold-short reports) ----------
+    if READY_RX.search(pt) and stage in (None, "taxi_issued", "taxi_after_cross") and not on_tower:
+        # HARD BLOCK: if we are at the Scenario 3 hold-short point, NEVER handoff to tower here.
+        if at_hs_point:
+            return None
+        # also block if we're still in Scenario 3 and have a hold-short runway but haven't crossed yet
+        if hs_rwy and stage == "taxi_issued" and not st.get("cross_rb_ok"):
+            return None
+
+        atc_suffix = f"contact Tower {KGSO_TOWER_FREQ}."
+        req = _MUST_CONTAIN.get("contact_tower")
+        if req:
+            # keep deterministic; only enforce token presence
+            atc_suffix = _normalize_tower_and_runway(atc_suffix)
+        st["stage"] = "handoff_twr"
+        return _atc(_normalize_tower_and_runway(atc_suffix))
+
+    # ---------- Tower ladder (Scenario 4) ----------
+    if (on_tower or stage == "handoff_twr") and stage in (None, "handoff_twr") and READY_RX.search(pt):
+        if _runway_is_free(dest_rw):
+            st["stage"] = "luaw_issued"
+            st["luaw_rb_ok"] = False
+            return _atc(f"Runway {dest_rw}, line up and wait.")
+        st["stage"] = "hold_short"
+        return _atc(f"hold short Runway {dest_rw}.")
+
+    if stage == "luaw_issued" and LUAW_RX.search(pt):
+        if not st.get("luaw_rb_ok"):
+            st["luaw_rb_ok"] = True
+            return _atc("readback correct.")
+        return None
+
+    if stage == "luaw_issued" and LINED_UP_RX.search(pt):
+        ok, alt_core = gate_runway_clearance("takeoff", dest_rw, cs)
+        if ok:
+            st["stage"] = "cleared_takeoff"
+            st["tkof_rb_ok"] = False
+            return _atc(f"Runway {dest_rw}, cleared for takeoff.")
+        return _atc(alt_core)
+
+    if stage == "cleared_takeoff" and TKOF_RX.search(pt):
+        if not st.get("tkof_rb_ok"):
+            st["tkof_rb_ok"] = True
+            return _atc("readback correct.")
+        return None
+
+    if PILOT_ASSERT_TKOF_RX.search(pt) and stage in (None, "handoff_twr", "luaw_issued") and (on_tower or stage in ("handoff_twr", "luaw_issued")):
+        st["stage"] = "luaw_issued"
+        st["luaw_rb_ok"] = False
+        return _atc(f"unable. Runway {dest_rw}, line up and wait.")
 
     return None
+
+
 
 def _vocal_approach_flow(cs: str, ctx: dict, pilot_text: str, dialogue: str) -> str | None:
     """
@@ -3533,7 +3812,7 @@ def voice_step(pilot_text: str):
     """
     Vocal Input step with:
       • Early 'readback correct' when pilot covers last ATC items.
-      • Ground ladder (taxi → handoff → takeoff + optional Departure handoff).
+      • Ground ladder (taxi → handoff Tower → takeoff + optional Departure handoff).
       • Approach ladder (check-in → approach clr → Tower handoff → landing clr).
       • Per-line 🕒 stamping (multi-line safe) and TTS without speaking timestamps.
     """
@@ -3609,17 +3888,76 @@ def voice_step(pilot_text: str):
     else:
         globals()["LAST_ACTIVE_CS"] = cs
 
-    rw    = ctx.get("runway", DEFAULT_RWY_PRIMARY)
-    phase = ctx.get("phase", "approach")
+    rw = ctx.get("runway", DEFAULT_RWY_PRIMARY)
 
-    # Phase cues (stronger than parse heuristics)
-    ground_cues_rx = re.compile(r'\b(ground|holding\s+short|hold\s+short|line\s*up|gate|taxi|ramp)\b', re.I)
-    apch_cues_rx   = re.compile(r'\b(approach|inbound|final|established|glideslope|localizer|cleared\s+to\s+land)\b', re.I)
+    # --- Stage awareness (sticky phase control) ---
+    prev_stage = None
+    try:
+        prev_stage = (CALLSTATE.get(cs) or {}).get("stage")
+    except Exception:
+        prev_stage = None
+
+    phase = ctx.get("phase", "approach")
     low_pt = pt.lower()
+
+    # --- Regex cues ---
+    ground_cues_rx = re.compile(
+        r'\b('
+        r'ground|tower|'
+        r'holding\s+short|hold\s+short|'
+        r'line\s*up(?:\s+and\s+wait)?|luaw|'
+        r'lined\s*up|in\s+position|position\s+and\s+hold|'
+        r'waiting|'
+        r'cleared\s+for\s+takeoff|takeoff|'
+        r'runway|'
+        r'gate|taxi|ramp'
+        r')\b', re.I
+    )
+    apch_cues_rx = re.compile(
+        r'\b(approach|inbound|final|established|glideslope|localizer|cleared\s+to\s+land)\b', re.I
+    )
+
+    # Departure check-in must be REAL (NOT “ready for departure”)
+    dep_checkin_strong_rx = re.compile(r'\b(greensboro\s+departure)\b', re.I)
+    dep_ctrl_terms_rx = re.compile(r'\b(passing\s+\d+|for\s+\d+|leaving|out\s+of|climb|heading|vector|radar\s+contact)\b', re.I)
+    ready_for_departure_rx = re.compile(r'\bready\s+for\s+departure\b', re.I)
+
+    # A "safe" departure cue:
+    #  - Greensboro Departure (strong), OR
+    #  - "departure" plus control terms (passing/for/climb/heading/etc.)
+    dep_safe_rx = re.compile(r'\bdeparture\b', re.I)
+    dep_is_real_checkin = bool(dep_checkin_strong_rx.search(low_pt)) or (
+        bool(dep_safe_rx.search(low_pt))
+        and bool(dep_ctrl_terms_rx.search(low_pt))
+        and not bool(ready_for_departure_rx.search(low_pt))
+    )
+
+    # --- Sticky phase rules ---
+    # Sticky ground if already in ground ladder stage and no approach cue.
+    if prev_stage in ("taxi_issued", "handoff_twr", "hold_short", "luaw_issued", "cleared_takeoff"):
+        if not apch_cues_rx.search(low_pt):
+            phase = "ground"
+
+    # Sticky departure ONLY after tower actually handed off to departure.
+    if prev_stage in ("handoff_dep", "dep_control") and not apch_cues_rx.search(low_pt):
+        phase = "departure"
+
+    # --- Explicit cue priority ---
     if apch_cues_rx.search(low_pt):
         phase = "approach"
-    elif ground_cues_rx.search(low_pt):
+    else:
+        # Ground beats departure if tower/hold-short/luaw/etc. is present
+        if ground_cues_rx.search(low_pt):
+            phase = "ground"
+        elif dep_is_real_checkin:
+            phase = "departure"
+
+    # Hard override: lined up/waiting during LUAW ladder must remain ground.
+    lined_up_cue_rx = re.compile(r'\b(lined\s*up|in\s+position|position\s+and\s+hold|waiting)\b', re.I)
+    if lined_up_cue_rx.search(low_pt) and prev_stage in ("luaw_issued", "cleared_takeoff", "handoff_twr", "hold_short"):
         phase = "ground"
+
+    ctx["phase"] = phase
 
     # Seed/refresh call state
     st = CALLSTATE.setdefault(cs, {"phase": phase, "runway": rw, "gate": ctx.get("gate"), "stage": None, "last_dt": None})
@@ -3637,7 +3975,6 @@ def voice_step(pilot_text: str):
     # ---------- Guards (bad callsign/runway) ----------
     guarded, tower_line = guard_or_tower(cs if cs and cs.upper() != "UNKNOWN" else None, rw)
     if guarded:
-        # tower_line is already branded & normalized by guard_or_tower()
         atc_unstamped = f"{EMOJI_ATC} ATC: {tower_line}"
         atc_block     = __stamp_block(atc_unstamped, ctx)
         VOICE_DIALOGUE += f"\n{atc_block}"
@@ -3657,7 +3994,6 @@ def voice_step(pilot_text: str):
             VOICE_DIALOGUE += f"\n{atc_block}"
             audio = __speak_block(atc_unstamped)
             status = "" if audio else ("ATC audio unavailable (check ELEVEN_API_KEY)" if _has_eleven else "Text OK — TTS not configured.")
-            # Update struct for next early-RB
             last_ui2 = _last_atc(VOICE_DIALOGUE)
             last_core2 = strip_atc_ui_to_core(last_ui2, cs) if last_ui2 else ""
             VOICE_LAST_ATC_STRUCT = _extract_items(last_core2) if last_core2 else None
@@ -3675,7 +4011,6 @@ def voice_step(pilot_text: str):
         VOICE_DIALOGUE += f"\n{atc_block}"
         audio = __speak_block(atc_unstamped)
         status = "" if audio else ("ATC audio unavailable (check ELEVEN_API_KEY)" if _has_eleven else "Text OK — TTS not configured.")
-        # Refresh structure after the new ATC
         last_ui2 = _last_atc(VOICE_DIALOGUE); last_core2 = strip_atc_ui_to_core(last_ui2, cs) if last_ui2 else ""
         VOICE_LAST_ATC_STRUCT = _extract_items(last_core2) if last_core2 else None
         monitor_header("XAION SIM END (VOICE CTX)")
@@ -3683,14 +4018,28 @@ def voice_step(pilot_text: str):
 
     # ---------- Forced flows ----------
     # GROUND ladder (taxi → handoff Tower → takeoff (+ Departure handoff))
-    if phase == "ground":
+    if phase == "ground" or (prev_stage in ("handoff_twr", "hold_short", "luaw_issued", "cleared_takeoff") and not apch_cues_rx.search(low_pt)):
         forced_unstamped = _vocal_ground_flow(cs, ctx, pt, VOICE_DIALOGUE)
         if forced_unstamped:
             atc_block = __stamp_block(forced_unstamped, ctx)
             VOICE_DIALOGUE += "\n" + atc_block
             audio = __speak_block(forced_unstamped)
             status = "" if audio else ("ATC audio unavailable (check ELEVEN_API_KEY)" if _has_eleven else "Text OK — TTS not configured.")
-            # Update struct using the last ATC line now in dialogue
+            last_ui2 = _last_atc(VOICE_DIALOGUE); last_core2 = strip_atc_ui_to_core(last_ui2, cs) if last_ui2 else ""
+            VOICE_LAST_ATC_STRUCT = _extract_items(last_core2) if last_core2 else None
+            monitor_header("XAION SIM END (VOICE CTX)")
+            return pt, "None", VOICE_DIALOGUE, (audio or None), status, snapshot_debug_dump(), None
+
+    # DEPARTURE: Only respond deterministically after a REAL Departure check-in.
+    if phase == "departure":
+        if dep_is_real_checkin:
+            atc_line = atc_prefix_and_dedup(cs, "fly heading 270, climb and maintain 10000.")
+            forced_unstamped = f"{EMOJI_ATC} ATC: {atc_line}"
+            st["stage"] = "dep_control"
+            atc_block = __stamp_block(forced_unstamped, ctx)
+            VOICE_DIALOGUE += "\n" + atc_block
+            audio = __speak_block(forced_unstamped)
+            status = "" if audio else ("ATC audio unavailable (check ELEVEN_API_KEY)" if _has_eleven else "Text OK — TTS not configured.")
             last_ui2 = _last_atc(VOICE_DIALOGUE); last_core2 = strip_atc_ui_to_core(last_ui2, cs) if last_ui2 else ""
             VOICE_LAST_ATC_STRUCT = _extract_items(last_core2) if last_core2 else None
             monitor_header("XAION SIM END (VOICE CTX)")
@@ -3704,22 +4053,18 @@ def voice_step(pilot_text: str):
             VOICE_DIALOGUE += "\n" + atc_block
             audio = __speak_block(forced_unstamped)
             status = "" if audio else ("ATC audio unavailable (check ELEVEN_API_KEY)" if _has_eleven else "Text OK — TTS not configured.")
-            # Update struct for early-RB on the next turn
             last_ui2 = _last_atc(VOICE_DIALOGUE); last_core2 = strip_atc_ui_to_core(last_ui2, cs) if last_ui2 else ""
             VOICE_LAST_ATC_STRUCT = _extract_items(last_core2) if last_core2 else None
             monitor_header("XAION SIM END (VOICE CTX)")
             return pt, "None", VOICE_DIALOGUE, (audio or None), status, snapshot_debug_dump(), None
 
     # ---------- Fallback: 1 LLM turn (ATC) ----------
-    # Use your gen_once() which already styles, normalizes, and brand-prefixes output.
     try:
         atc_unstamped_line = gen_once("ATC", VOICE_DIALOGUE, {
             "phase": phase, "runway": rw, "callsign": cs
         })
-        # Ensure string + single/multi-line safe
         atc_unstamped = (atc_unstamped_line or "").strip()
         if not atc_unstamped:
-            # deterministic ultra-short fallback
             core = f"{cs}, say again."
             atc_unstamped = f"{EMOJI_ATC} ATC: {xaion_prefix(cs)}{core}"
         elif not atc_unstamped.lower().startswith("🗼 atc:"):
@@ -3734,12 +4079,12 @@ def voice_step(pilot_text: str):
     audio = __speak_block(atc_unstamped)
     status = "" if audio else ("ATC audio unavailable (check ELEVEN_API_KEY)" if _has_eleven else "Text OK — TTS not configured.")
 
-    # Update structure for next-turn early-RB
     last_ui2 = _last_atc(VOICE_DIALOGUE); last_core2 = strip_atc_ui_to_core(last_ui2, cs) if last_ui2 else ""
     VOICE_LAST_ATC_STRUCT = _extract_items(last_core2) if last_core2 else None
 
     monitor_header("XAION SIM END (VOICE CTX)")
     return pt, "None", VOICE_DIALOGUE, (audio or None), status, snapshot_debug_dump(), None
+
 
 # -------------------------------
 # Triplet helpers (ATC LLM → Pilot LLM → ATC confirm)
@@ -4316,7 +4661,9 @@ def single_handoff(comm_type: str, scenario_text: str):
     monitor_header("XAION SIM END (SINGLE HANDOFF)")
 
 
+# ===============================
 
+# Unified run handler + Gradio UI (Pilot transcript visible only in Vocal Input)
 # ===============================
 
 # -------------------------------
@@ -4456,7 +4803,7 @@ with gr.Blocks() as demo:
 
     with gr.Row(visible=False) as vocal_row:
         mic = gr.Audio(sources=["microphone"], type="numpy", label="🎙️ Speak your pilot call/reply")
-        transcript_box = gr.Textbox(label=f"📝 Transcript ({'Whisper API' if USE_WHISPER_API else 'Whisper API-'})",
+        transcript_box = gr.Textbox(label=f"📝 Transcript ({'Whisper API' if USE_WHISPER_API else 'Whisper API '})",
                                     interactive=True)
 
     atc_voice_out = gr.Audio(label="🎧 ATC (voice)", type="filepath", autoplay=True)
