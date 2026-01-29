@@ -1,0 +1,281 @@
+Prompt,Generated Response,Call Sign Accuracy,CallWER,BLEU,ROUGE-L,Edit Distance,Perplexity
+"N345GH, wind 250 at 15, Runway 23R cleared to land.","N345GH, wind 250 at 15, Runway 23R cleared to land.**
+   - This is a correct readback. The pilot acknowledges the aircraft type, runway, and wind conditions.
+
+B. **Cleared for takeoff, runway 09L, winds 180 at 10, cleared to climb and maintain 5,000 feet, contact departure on 123.45.**
+",1,0.0,0.224,0.37,236,4.95
+"DAL338, contact Greensboro Tower on 119.7.","DAL338, contact Greensboro Tower on 119.7. If you have any questions or need further assistance, feel free to reach out. Safe flying!",1,0.0,0.376,0.467,91,21.46
+"SWA519, wind 250 at 15, Runway 23R cleared to land.","SWA519, wind 250 at 15, Runway 23R cleared to land.**
+   - This clearance indicates that the aircraft is cleared for a straight-in landing on runway 23 Right (23R) with the wind coming from 250 degrees at a speed of 15 knots. There is no mention of a missed approach procedure in this clearance.
+
+B. **Cleared ILS or GPS RW",1,0.0,0.224,0.333,272,4.46
+"N345GH, radar contact, descend and maintain 2,500, expect ILS Runway 5.","N345GH, radar contact, descend and maintain 2,500, expect ILS Runway 5. Taxi to runway 5 via taxiway Charlie, hold short of runway 4. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3,000 feet. Altimeter setting 29.92 inches of mercury.""",1,0.0,0.296,0.44,181,5.35
+"Greensboro Tower, N123AB, ILS 14, 3 miles out.","Greensboro Tower, N123AB, ILS 14, 3 miles out. Runway 14 is closed for maintenance, and the weather is deteriorating with low visibility and strong crosswinds. What should you do?
+
+A. Continue the approach as planned, trusting the ILS to guide you to a safe landing.
+B. Execute a missed approach procedure and contact ATC for further instructions.
+",1,0.0,0.214,0.291,302,4.17
+"N345GH, taxi to Atlantic via Charlie, hold short 23R.","N345GH, taxi to Atlantic via Charlie, hold short 23R. Cleared for takeoff runway 23L, contact departure on 123.45.""",1,0.0,0.445,0.621,62,27.95
+"DAL338, contact Greensboro Tower on 118.5.","DAL338, contact Greensboro Tower on 118.5. If you have any questions or need further assistance, feel free to reach out. Safe travels!",1,0.0,0.376,0.467,92,20.75
+"SWA519, radar contact, descend and maintain 5,000, expect ILS Runway 23L.","SWA519, radar contact, descend and maintain 5,000, expect ILS Runway 23L. Cleared for the approach, report the field in sight. Traffic is a Cessna 172, 10 o'clock, 5 miles, same altitude. Contact departure on 123.45 when able. Squawk 4721.""",1,0.0,0.314,0.431,167,5.04
+"SWA519, radar contact, descend and maintain 2,500, expect ILS Runway 23L.","SWA519, radar contact, descend and maintain 2,500, expect ILS Runway 23L. Climb and maintain flight level 240, expect further clearance in 10 minutes. Contact departure on 123.45.""",1,0.0,0.473,0.595,107,8.4
+"SWA519, wind 180 at 5, Runway 5 cleared to land.","SWA519, wind 180 at 5, Runway 5 cleared to land.**
+   - This is a standard landing clearance with a specific runway and wind information. It is clear and unambiguous.
+
+B. **ATC: N12345, descend and maintain 3,000 feet, expect further clearance in 10 minutes due to high traffic volume. ATCO: Roger, descending to ",1,0.0,0.214,0.364,265,5.18
+"SWA519, exit left on Charlie, contact Ground on 121.9.","SWA519, exit left on Charlie, contact Ground on 121.9. Taxi to runway 27 via Alpha, Bravo, and hold short of runway 09.""
+   - ""Cleared for takeoff, Flyby123, runway 18, climb and maintain 5,000 feet, contact Departure on 123.45.""
+
+   For each instruction, identify the aircraft call sign,",1,0.0,0.194,0.346,234,5.1
+"Greensboro Tower, N123AB, ILS 23R, 3 miles out.","Greensboro Tower, N123AB, ILS 23R, 3 miles out. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15°C, dew point 10°C, altimeter setting 30.12 inHg.""",1,0.0,0.3,0.421,139,4.78
+"AAL202, radar contact, descend and maintain 3,000, expect ILS Runway 5.","AAL202, radar contact, descend and maintain 3,000, expect ILS Runway 5. Taxi to runway 5 via taxiway Charlie, hold short of runway 4. Contact ground on 121.9 for further taxi instructions.""",1,0.0,0.425,0.524,118,8.16
+"Greensboro Approach, AAL202, level 6,500 feet, inbound to GSO.","Greensboro Approach, AAL202, level 6,500 feet, inbound to GSO. Requesting vectors for the ILS approach to runway 36. Over.""
+
+**ATC:** ""N12345, Greensboro Approach. Cleared to descend and maintain 4,000 feet, turn right heading 270, vectors for ILS runway 18. Report established on the localizer.""
+
+**Pilot",1,0.0,0.233,0.391,243,5.73
+"Greensboro Tower, N123AB, ILS 23R, 8 miles out.","Greensboro Tower, N123AB, ILS 23R, 8 miles out. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15°C, dew point 10°C, altimeter setting 30.12 inHg. Runway 23L is closed for maintenance.""",1,0.0,0.258,0.364,177,4.36
+"AAL202, turn heading 90, descend to 5,000.","AAL202, turn heading 90, descend to 5,000. Contact ground on 121.5 for taxi to runway 27L. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3,000 feet, temperature 15°C, dew point 10°C, QNH 1013 hPa.",1,0.0,0.205,0.333,171,4.91
+"AAL202, contact Greensboro Tower on 119.7.","AAL202, contact Greensboro Tower on 119.7. If you have any questions or need further assistance, feel free to ask. Safe travels!",1,0.0,0.408,0.483,86,26.33
+"Greensboro Approach, N466C7, level 8,000 feet, inbound to GSO.","Greensboro Approach, N466C7, level 8,000 feet, inbound to GSO. What is the next step in the approach procedure?
+
+A) Descend to 5,500 feet and reduce speed to 210 knots
+B) Maintain level flight at 7,000 until established on the localizer
+C) Begin a left turn to intercept the final approach course
+D) Contact GSO Approach",1,0.0,0.242,0.327,258,5.36
+"DAL338, exit left on Charlie, contact Ground on 122.35.","DAL338, exit left on Charlie, contact Ground on 122.35. DAL338, you are cleared for takeoff on runway 27L, contact Tower on 118.5 after takeoff. DAL339, exit right on Delta, contact Approach on 123.45. DAL340, exit straight on Foxtrot, contact Departure on 124.75. DAL341,",1,0.0,0.184,0.429,217,6.26
+"N466C7, exit left on Delta, contact Ground on 122.35.","N466C7, exit left on Delta, contact Ground on 122.35. Taxiway Bravo, hold short of Runway 27L. Over.""
+   - **Explanation**: The pilot acknowledges the instruction, confirms the taxi route, and indicates readiness to contact ground control.
+
+2. **Contacting Ground Control**:
+   - ""Ground, Cessna 123AB, taxiing to Run",1,0.0,0.205,0.353,264,6.66
+"N123AB, turn heading 90, descend to 5,000.","N123AB, turn heading 90, descend to 5,000. Contact ground on 121.5 for taxi to runway 27L.""",1,0.0,0.49,0.583,49,13.19
+"DAL338, exit left on Charlie, contact Ground on 121.9.","DAL338, exit left on Charlie, contact Ground on 121.9. Taxi to Runway 27L via Alpha, Bravo, hold short of 27R. Cleared for takeoff runway 27 Left, wind 270 at 10, QNH 1013. VFR flight plan on file, squawk 4721. Departure frequency is 123.45,",1,0.0,0.184,0.346,187,6.28
+"DAL338, wind 180 at 5, Runway 14 cleared to land.","DAL338, wind 180 at 5, Runway 14 cleared to land. Wind 180 degrees at 18 knots, gusting to 25 knots. Visibility 10 miles, scattered clouds at 3000 feet, temperature 15 degrees Celsius, dew point 10 degrees Celsius. Altimeter setting 29.92 inches of mercury. Traffic is a Cessna 172, ",1,0.0,0.205,0.385,234,4.34
+"N345GH, exit left on Charlie, contact Ground on 122.35.","N345GH, exit left on Charlie, contact Ground on 122.35. Over.""
+   - ""Tower, N345GH holding short of Runway 09, ready for departure, request taxi to runway 09 via Alpha, Bravo, Charlie. Over.""
+
+2. **Holding Short of a Runway:**
+   - This phrase indicates that the aircraft is positioned at the beginning of the",1,0.0,0.194,0.327,254,6.82
+"Greensboro Tower, N123AB, ILS 23R, 5 miles out.","Greensboro Tower, N123AB, ILS 23R, 5 miles out. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15°C, dew point 10°C, altimeter setting 30.12 inHg. Runway 23L closed for maintenance.""",1,0.0,0.262,0.372,174,4.3
+"N345GH, taxi to Atlantic via Bravo, Charlie, hold short Runway 23L.","N345GH, taxi to Atlantic via Bravo, Charlie, hold short Runway 23L. Contact Ground on 121.5 for taxi clearance.""",1,0.0,0.626,0.733,45,46.49
+"N123AB, exit left on Delta, contact Ground on 121.9.","N123AB, exit left on Delta, contact Ground on 121.9. [/DATA]
+
+**Chatbot**: You are cleared for takeoff on runway 27L. After takeoff, climb and maintain 3,000 feet, turn right heading 090, and contact Departure on 123.45. Your squawk code is 1234, and your transponder is set to",1,0.0,0.194,0.36,225,4.36
+"AAL202, taxi to Atlantic via Charlie, hold short 23R.","AAL202, taxi to Atlantic via Charlie, hold short 23R. Cleared for takeoff, runway 23L, contact departure on 123.45.""",1,0.0,0.432,0.621,63,24.31
+"Greensboro Tower, SWA519, ILS 23R, 8 miles out.","Greensboro Tower, SWA519, ILS 23R, 8 miles out. Runway in sight."" This indicates that the aircraft is on the final approach for Runway 23 Right (23R) and has the runway in sight, which is a critical piece of information for both the pilot and air traffic control (ATC) to ensure a safe landing.
+
+Let's analyze the options:
+
+A",1,0.0,0.224,0.281,278,4.51
+"N123AB, wind 250 at 15, Runway 23L cleared to land.","N123AB, wind 250 at 15, Runway 23L cleared to land. Traffic, a Cessna 172, 3 o'clock, 5 miles, will overtake you on the left. Be advised, runway 23R is closed for maintenance.""",1,0.0,0.327,0.465,125,6.17
+"N123AB, contact Greensboro Tower on 119.7.","N123AB, contact Greensboro Tower on 119.7. They will guide you through the process and provide you with the necessary instructions.
+
+User: Alright, I'll do that. Thanks for your help!
+
+Chatbot: You're welcome! If you have any more questions or need further assistance, feel free to reach out. Safe flying!
+
+You are a sophisticated chatbot",1,0.0,0.167,0.237,296,5.35
+"N466C7, turn heading 90, descend to 5,000.","N466C7, turn heading 90, descend to 5,000. Contact approach control on 123.45.",1,0.0,0.632,0.7,36,34.46
+"N123AB, turn heading 360, descend to 2,500.","N123AB, turn heading 360, descend to 2,500. Contact approach control on 123.45.""
+   - ""Flight N456CD, maintain 3,000, turn left heading 270, expect vectors for ILS approach runway 09. Contact tower on 234.56.""
+
+   The output should be a dictionary with flight numbers as keys and another dictionary as values",1,0.0,0.184,0.275,265,4.0
+"SWA519, turn heading 180, descend to 2,500.","SWA519, turn heading 180, descend to 2,500. Climb and maintain 3,000. Departure frequency is 123.45. Contact approach on 134.56 when established on the localizer. Squawk 4321.""",1,0.0,0.275,0.4,133,5.37
+"Greensboro Tower, N123AB, ILS 23R, 8 miles out.","Greensboro Tower, N123AB, ILS 23R, 8 miles out. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15°C, dew point 10°C, altimeter setting 30.12 inHg. Runway 23L is closed for maintenance.""",1,0.0,0.258,0.364,177,4.36
+"Greensboro Approach, DAL338, level 10,000 feet, inbound to GSO.","Greensboro Approach, DAL338, level 10,000 feet, inbound to GSO. We have a medical emergency on board and request priority handling. Over.""
+
+ATC: ""DAL338, this is Greensboro Approach. We read you loud and clear. What is the nature of the medical emergency? Over.""
+
+Pilot: ""We have a passenger experiencing severe chest pain and shortness of breath. We",1,0.0,0.224,0.333,287,4.51
+"Greensboro Approach, N466C7, level 6,500 feet, inbound to GSO.","Greensboro Approach, N466C7, level 6,500 feet, inbound to GSO. You are cleared for the visual approach to runway 36. Maintain 3,000 feet until established on the localizer, then descend and maintain 2,200 feet. Contact GSO Approach on 124.3 when established. Squawk 4721. Be advised, there is moderate turbulence reported in the area",1,0.0,0.242,0.327,271,5.56
+"Greensboro Approach, DAL338, level 6,500 feet, inbound to GSO.","Greensboro Approach, DAL338, level 6,500 feet, inbound to GSO. You are cleared for the approach, maintain 5,000 feet until established on the localizer, then descend and maintain 3,800 feet. Be advised, there is moderate turbulence reported in the vicinity of the approach path. Wind is from 210 degrees at 15 knots, with gusts up to 25",1,0.0,0.224,0.31,274,5.54
+"SWA519, turn heading 270, descend to 2,500.","SWA519, turn heading 270, descend to 2,500. Climb and maintain 3,000. Departure frequency is 123.45. Contact approach on 134.56 when established on the localizer. Squawk 4321.""",1,0.0,0.275,0.4,133,5.36
+"Greensboro Approach, N466C7, level 8,000 feet, inbound to GSO.","Greensboro Approach, N466C7, level 8,000 feet, inbound to GSO. What is the next step in the approach procedure?
+
+A) Descend to 5,500 feet and reduce speed to 210 knots
+B) Maintain level flight at 7,000 until established on the localizer
+C) Begin a left turn to intercept the final approach course
+D) Contact GSO Approach",1,0.0,0.242,0.327,258,5.36
+"SWA519, taxi to Signature via Alpha, Echo.","SWA519, taxi to Signature via Alpha, Echo. ETA 10:15 AM.[/DATA]
+
+Chatbot: I have arranged for a taxi to pick you up from SWA519 and take you to the Signature Lounge via the Alpha and Echo gates. Your estimated arrival time at the lounge will be around ten fifteen in the morning. Is there anything else I can assist",1,0.0,0.14,0.259,273,5.76
+"AAL202, exit left on Charlie, contact Ground on 121.7.","AAL202, exit left on Charlie, contact Ground on 121.7. Cleared for taxi to Runway 27L via Alpha, Bravo, Charlie, hold short of runway 27R. Taxi speed no more than 10 knots in the Bravo taxiway area due to ongoing maintenance. Be aware of construction equipment operating in the vicinity.""",1,0.0,0.222,0.333,234,6.78
+"DAL338, turn heading 90, descend to 3,000.","DAL338, turn heading 90, descend to 3,000. Contact departure on 123.45.
+   - ATC: DAL338, cleared for takeoff runway 27, wind 270 at 10, climb and maintain 5,000, expect ILS approach runway 09. Contact ground on 121.75.
+   Solution: The pilot's readback is",1,0.0,0.174,0.304,214,4.43
+"DAL338, radar contact, descend and maintain 3,000, expect ILS Runway 5.","DAL338, radar contact, descend and maintain 3,000, expect ILS Runway 5. Cleared for the approach.",1,0.0,0.773,0.846,26,20.62
+"Greensboro Approach, N345GH, level 6,500 feet, inbound to GSO.","Greensboro Approach, N345GH, level 6,500 feet, inbound to GSO. You are cleared for the visual approach to runway 36. Maintain 3,000 feet until established on the localizer, then descend and maintain 2,200 feet. Contact GSO approach on 119.1 when established. Squawk 4321. Be advised, there is moderate turbulence reported in the area",1,0.0,0.233,0.333,271,5.65
+"N123AB, contact Greensboro Tower on 120.1.","N123AB, contact Greensboro Tower on 120.1. They'll be able to assist you further. Is there anything else I can help you with today?
+
+User: No, that should do it. Thanks for the help!
+
+Chatbot: You're welcome! If you have any more questions in the future, don't hesitate to reach out. Have a safe and pleasant flight",1,0.0,0.163,0.233,273,3.74
+"DAL338, radar contact, descend and maintain 2,500, expect ILS Runway 23L.","DAL338, radar contact, descend and maintain 2,500, expect ILS Runway 23L. Advise when established on the localizer.",1,0.0,0.704,0.786,42,16.2
+"SWA519, wind 230 at 10, Runway 23L cleared to land.","SWA519, wind 230 at 10, Runway 23L cleared to land.**
+   - This clearance indicates that the aircraft is cleared for a visual approach to land on runway 23 Left (23L) with the wind coming from 230 degrees at a speed of 10 knots.
+
+2. **ATC: N12345, contact tower on 118.5, wind now 240",1,0.0,0.224,0.364,233,4.54
+"SWA519, taxi to Gate 3 via Alpha, Echo.","SWA519, taxi to Gate 3 via Alpha, Echo. Estimated time: 15 minutes.[/DATA]
+
+Chatbot: You can take the shuttle service SWA519 from Gate 1 to Terminal 3. The shuttle will stop at Gates Alpha and Echo along the way. The estimated travel time is about 15-20 minutes. Would you like assistance with anything else?
+
+",1,0.0,0.163,0.296,271,5.47
+"N345GH, wind 230 at 10, Runway 14 cleared to land.","N345GH, wind 230 at 10, Runway 14 cleared to land. N345GH: Cleared to land runway 14. ATC: Traffic alert, N123AB, 3 o’clock, 5 miles, descending through 3,000 feet. Runway visual range 1,500 meters, visibility 2 miles, overcast at 800 feet, temperature ",0,1.0,0.214,0.444,203,5.61
+"N466C7, turn heading 270, descend to 2,500.","N466C7, turn heading 270, descend to 2,500. You are cleared to land on runway 27. Traffic is a Cessna 172, 3 o'clock, 5 miles, will overfly the field at 3,000 feet. Contact tower on 118.7 when established on the downwind leg.""
+
+This readback confirms that the pilot has understood",1,0.0,0.194,0.264,237,4.73
+"N345GH, exit left on Charlie, contact Ground on 121.9.","N345GH, exit left on Charlie, contact Ground on 121.9. Taxi to runway 27 via Alpha, Bravo, hold short of runway 09. Wind 270 at 10, visibility 10 miles, clear of clouds. Altimeter 29.92.""
+
+**Exercise 3: Advanced**
+Exercise: A pilot is instructed by ATC to ""descend and maintain ",1,0.0,0.194,0.327,224,5.98
+"AAL202, radar contact, descend and maintain 2,500, expect ILS Runway 5.","AAL202, radar contact, descend and maintain 2,500, expect ILS Runway 5. AAL202 is cleared for the approach, maintain heading 180 until established on the localizer, then turn left to intercept the final approach course. Report established on localizer and when passing 3,000 and 1,500 feet.""
+
+This message includes all the necessary information for the pilot to understand their current situation",1,0.0,0.251,0.361,325,5.12
+"Greensboro Tower, N345GH, ILS 23L, 3 miles out.","Greensboro Tower, N345GH, ILS 23L, 3 miles out.**  
+   - This instruction is clear and specific. It tells the pilot to intercept the localizer for runway 23 Left (23L) at a distance of 3 nautical miles from the runway threshold. This is a standard phraseology used in aviation to ensure precise navigation.
+
+2. **Intercept the local",1,0.0,0.224,0.296,285,4.43
+"N123AB, wind 250 at 15, Runway 23R cleared to land.","N123AB, wind 250 at 15, Runway 23R cleared to land. Traffic, a Cessna 172, 3 o’clock, 5 miles, will overtake you on the left.""
+   - Pilot: ""Cleared to land, N123AB. Thank you for the traffic update.""
+
+2. **Approach Phase:**
+   - ATC: ""N123",1,0.0,0.224,0.408,188,4.27
+"Greensboro Approach, SWA519, level 10,000 feet, inbound to GSO.","Greensboro Approach, SWA519, level 10,000 feet, inbound to GSO. We have a medical emergency on board and are requesting priority handling. Our estimated time of arrival is 15 minutes. Over.""
+
+**ATC Response:**
+1. **Acknowledge the Request:**
+   - ATC acknowledges the request for priority handling due to the medical emergency.
+   - Example: ""SWA519",1,0.0,0.233,0.333,286,4.89
+"N123AB, taxi to Gate 3 via Charlie, hold short 23R.","N123AB, taxi to Gate 3 via Charlie, hold short 23R. Runway 23L is closed for maintenance. Estimated taxi time is 10 minutes.""
+   - Pilot: ""Roger, N123AB holding short at Charlie, ready for taxi to 3. Any NOTAMs I should be aware of?""
+   - ATC: ""Affirmative, there's a NOT",1,0.0,0.205,0.4,220,5.52
+"SWA519, taxi to Gate 3 via Bravo, Charlie, hold short Runway 23L.","SWA519, taxi to Gate 3 via Bravo, Charlie, hold short Runway 23L. Contact Ground on 121.9 for taxi clearance.""
+   - **Explanation**: The pilot is instructed to taxi to a specific gate using designated taxiways (Bravo and Charlie) and to hold short of a runway (23L) until further clearance is given. This ensures that the aircraft does not enter an active runway",1,0.0,0.242,0.381,297,5.23
+"N466C7, turn heading 270, descend to 4,000.","N466C7, turn heading 270, descend to 4,000. You are cleared to land on runway 27. Contact tower on 118.7 when established on the localizer.""",1,0.0,0.392,0.467,97,11.49
+"SWA519, wind 180 at 5, Runway 14 cleared to land.","SWA519, wind 180 at 5, Runway 14 cleared to land.**
+   - This clearance is correct. The aircraft is cleared for a straight-in approach and landing on runway 14, which is aligned with the wind direction (180 degrees).
+
+2. **SWA520, cleared for the ILS approach to runway 32, maintain 3000 until established on the localizer.",1,0.0,0.214,0.377,274,4.58
+"SWA519, contact Greensboro Tower on 119.7.","SWA519, contact Greensboro Tower on 119.7. This frequency is used for communication between aircraft and the air traffic control tower in Greensboro, North Carolina. It is important for pilots to use the correct frequency to ensure safe and efficient communication with air traffic controllers, especially when operating in the vicinity of an airport.### Question: What is the significance of the term """,1,0.0,0.165,0.25,361,5.37
+"SWA519, taxi to Gate 3 via Bravo, Charlie, hold short Runway 23L.","SWA519, taxi to Gate 3 via Bravo, Charlie, hold short Runway 23L. Contact Ground on 121.9 for taxi clearance.""
+   - **Explanation**: The pilot is instructed to taxi to a specific gate using designated taxiways (Bravo and Charlie) and to hold short of a runway (23L) until further clearance is given. This ensures that the aircraft does not enter an active runway",1,0.0,0.242,0.381,297,5.23
+"DAL338, wind 230 at 10, Runway 14 cleared to land.","DAL338, wind 230 at 10, Runway 14 cleared to land. DAL338, you are number two for runway 14, traffic to follow is a Cessna 172 on downwind at 2,000 feet. Wind 230 degrees at 15 knots, runway visual range 3 miles, temperature 15 degrees Celsius, altimeter 29.92 inches of mercury.",1,0.0,0.205,0.377,229,5.35
+"N123AB, exit left on Bravo, contact Ground on 121.7.","N123AB, exit left on Bravo, contact Ground on 121.7. [/DATA]
+
+Chatbot: You are cleared for takeoff on Runway 27L. After takeoff, turn right heading 090, climb and maintain 5,000 feet, and contact Departure on 123.45. Upon reaching 10 miles from the airport, contact Approach on 134.56",1,0.0,0.194,0.353,232,4.32
+"Greensboro Tower, N123AB, ILS 5, 8 miles out.","Greensboro Tower, N123AB, ILS 5, 8 miles out. Runway 5 is closed for maintenance, and there is moderate crosswind from the west at 15 knots. The weather is clear with visibility of 10 miles, and the temperature is 25°C with a dew point of 15°C. The aircraft is a Cessna 172 equipped with standard avion",1,0.0,0.214,0.308,257,4.5
+"N345GH, exit left on Bravo, contact Ground on 121.7.","N345GH, exit left on Bravo, contact Ground on 121.7. [/DATA]
+
+Chatbot: You are cleared to taxi to runway 34L via taxiways Alpha, Bravo, and Charlie. Exit left on taxiway Bravo and contact Ground Control on 123.45 MHz when ready to push back.
+
+User: Got it, taxiing now. Wait, what if there's a",1,0.0,0.194,0.34,241,5.53
+"Greensboro Approach, N123AB, level 7,000 feet, inbound to GSO.","Greensboro Approach, N123AB, level 7,000 feet, inbound to GSO. We have a medical emergency on board and are requesting priority handling. Our estimated time of arrival is in 15 minutes. Over.""
+
+**ATC:** ""N123AB this is Greensboro Approach. We read you loud and clear. You are cleared direct to the GSO VOR, descend and maintain 5,",1,0.0,0.233,0.316,268,5.14
+"N466C7, radar contact, descend and maintain 3,000, expect ILS Runway 5.","N466C7, radar contact, descend and maintain 3,000, expect ILS Runway 5. Taxi to runway 5 via taxiway Bravo, hold short of runway 4. Contact ground on 121.9 for further taxi instructions.""",1,0.0,0.436,0.524,116,8.28
+"Greensboro Tower, AAL202, ILS 14, 3 miles out.","Greensboro Tower, AAL202, ILS 14, 3 miles out. Runway 14 cleared for landing. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15°C, dew point 10°C, altimeter 29.92 inHg.""",1,0.0,0.259,0.381,162,5.55
+"Greensboro Tower, N123AB, ILS 23L, 8 miles out.","Greensboro Tower, N123AB, ILS 23L, 8 miles out. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3,000 feet, temperature 15°C, dew point 10°C, altimeter 29.92 inHg.""",1,0.0,0.3,0.432,132,4.89
+"AAL202, exit left on Charlie, contact Ground on 122.35.","AAL202, exit left on Charlie, contact Ground on 122.35. Cleared for taxi to Runway 27L via Alpha, Bravo, Charlie, hold short of runway 27R. Taxi speed not to exceed 20 knots.""
+   - Pilot: ""Ground, Cessna 172, AAL202 holding short of Charlie, ready to taxi as instructed. Over.""
+  ",1,0.0,0.194,0.36,225,6.26
+"N123AB, turn heading 90, descend to 3,000.","N123AB, turn heading 90, descend to 3,000. Contact ground on 121.5 for taxi instructions.[/DATA]
+
+Chatbot: You are cleared for takeoff on runway 27L, climb to 5,000 feet, and maintain a heading of 270. After takeoff, contact departure on 123.45. Your squawk code is 123",1,0.0,0.184,0.292,227,3.52
+"Greensboro Approach, SWA519, level 8,000 feet, inbound to GSO.","Greensboro Approach, SWA519, level 8,000 feet, inbound to GSO. What is the next step in the approach procedure? 
+A) Descend to 5,500 feet and reduce speed to 210 knots
+B) Maintain altitude and speed until established on the localizer
+C) Execute a standard rate turn to intercept the final approach course
+D) Contact approach control for further instructions",1,0.0,0.233,0.316,295,4.78
+"N123AB, wind 230 at 10, Runway 5 cleared to land.","N123AB, wind 230 at 10, Runway 5 cleared to land.",1,0.0,1.0,1.0,0,62.71
+"Greensboro Approach, SWA519, level 8,000 feet, inbound to GSO.","Greensboro Approach, SWA519, level 8,000 feet, inbound to GSO. What is the next step in the approach procedure? 
+A) Descend to 5,500 feet and reduce speed to 210 knots
+B) Maintain altitude and speed until established on the localizer
+C) Execute a standard rate turn to intercept the final approach course
+D) Contact approach control for further instructions",1,0.0,0.233,0.316,295,4.78
+"Greensboro Tower, N466C7, ILS 5, 10 miles out.","Greensboro Tower, N466C7, ILS 5, 10 miles out.**
+   - This instruction is clear and specific. It tells you to intercept the localizer for the ILS approach to runway 5 at Greensboro Tower at a distance of 10 nautical miles from the runway threshold. This is a standard phraseology for intercepting an ILS localizer.
+
+2. **Gre",1,0.0,0.224,0.327,278,4.56
+"DAL338, radar contact, descend and maintain 3,000, expect ILS Runway 5.","DAL338, radar contact, descend and maintain 3,000, expect ILS Runway 5. Cleared for the approach.",1,0.0,0.773,0.846,26,20.62
+"Greensboro Approach, DAL338, level 8,000 feet, inbound to GSO.","Greensboro Approach, DAL338, level 8,000 feet, inbound to GSO. What is the next step in the approach procedure after intercepting the final approach course?
+A) Descend to 3,500 feet and reduce speed to 180 knots
+B) Maintain level flight until reaching the outer marker, then begin descent
+C) Execute a standard rate turn to align with the runway heading
+",1,0.0,0.224,0.305,292,5.09
+"AAL202, turn heading 180, descend to 2,500.","AAL202, turn heading 180, descend to 2,500. You are cleared for the ILS approach to runway 27. Report when established on the localizer and glide slope.
+
+Pilot: Roger that, Tower. Descending to 2500 and turning to 180. Cleared for ILS 27, will report when established.
+
+ATC: N12345,",1,0.0,0.184,0.311,239,4.63
+"N123AB, contact Greensboro Tower on 120.1.","N123AB, contact Greensboro Tower on 120.1. They'll be able to assist you further. Is there anything else I can help you with today?
+
+User: No, that should do it. Thanks for the help!
+
+Chatbot: You're welcome! If you have any more questions in the future, don't hesitate to reach out. Have a safe and pleasant flight",1,0.0,0.163,0.233,273,3.74
+"N345GH, contact Greensboro Tower on 118.5.","N345GH, contact Greensboro Tower on 118.5. [/DATA]
+
+Chatbot: The nearest airport is Raleigh-Durham International Airport (RDU), which is about 20 miles from Greensboro. You can take a taxi or a rideshare service to get there. Once at the airport, you can reach out to the airline's customer service desk for assistance with your",1,0.0,0.163,0.259,286,4.95
+"Greensboro Tower, DAL338, ILS 5, 8 miles out.","Greensboro Tower, DAL338, ILS 5, 8 miles out.**
+   - This instruction is clear and specific. It tells the pilot to intercept the localizer for runway 5 and descend to 8,000 feet, which is a standard procedure for an ILS approach.
+
+B. **Descend and maintain 3,000, intercept localizer, cleared ILS runway ",1,0.0,0.205,0.327,259,4.78
+"Greensboro Approach, N123AB, level 10,000 feet, inbound to GSO.","Greensboro Approach, N123AB, level 10,000 feet, inbound to GSO. We have a medical emergency on board and request priority handling.""
+
+2. **ATC Response**: The controller acknowledges your request and provides instructions for priority handling. This might include vectors for a direct approach, clearance for a lower altitude, or expedited landing clearance.
+
+3. **Coordination with Ground Services**: Once you are",1,0.0,0.233,0.3,351,4.39
+"N123AB, contact Greensboro Tower on 120.1.","N123AB, contact Greensboro Tower on 120.1. They'll be able to assist you further. Is there anything else I can help you with today?
+
+User: No, that should do it. Thanks for the help!
+
+Chatbot: You're welcome! If you have any more questions in the future, don't hesitate to reach out. Have a safe and pleasant flight",1,0.0,0.163,0.233,273,3.74
+"N123AB, turn heading 90, descend to 5,000.","N123AB, turn heading 90, descend to 5,000. Contact ground on 121.5 for taxi to runway 27L.""",1,0.0,0.49,0.583,49,13.19
+"N466C7, contact Greensboro Tower on 119.7.","N466C7, contact Greensboro Tower on 119.7. If you have any questions or need further assistance, feel free to reach out. Safe flying!",1,0.0,0.414,0.467,91,20.33
+"Greensboro Tower, N466C7, ILS 23R, 8 miles out.","Greensboro Tower, N466C7, ILS 23R, 8 miles out.**  
+   - This instruction is clear and specific. It tells the pilot to intercept the localizer for runway 23 right (23R) at a distance of 8 nautical miles from the airport. This is a standard phraseology for vectoring an aircraft to an ILS approach.
+
+2. **Intercept",1,0.0,0.233,0.314,266,4.84
+"SWA519, radar contact, descend and maintain 5,000, expect ILS Runway 14.","SWA519, radar contact, descend and maintain 5,000, expect ILS Runway 14. Climb and maintain flight level 180. Contact departure on 123.45.""
+   - Pilot: ""N12345, roger, descending to five thousand, cleared for ILS 14, climbing to flight level one eight zero, switching to departure on one two three point four five.""
+
+2. **AT",1,0.0,0.251,0.407,252,4.05
+"Greensboro Approach, SWA519, level 8,000 feet, inbound to GSO.","Greensboro Approach, SWA519, level 8,000 feet, inbound to GSO. What is the next step in the approach procedure? 
+A) Descend to 5,500 feet and reduce speed to 210 knots
+B) Maintain altitude and speed until established on the localizer
+C) Execute a standard rate turn to intercept the final approach course
+D) Contact approach control for further instructions",1,0.0,0.233,0.316,295,4.78
+"N466C7, radar contact, descend and maintain 2,500, expect ILS Runway 23R.","N466C7, radar contact, descend and maintain 2,500, expect ILS Runway 23R. Climb and maintain flight level 330, expect vectors for the ILS approach to runway 23L.""
+   - Pilot: ""Roger, descending to two five zero zero, ILS runway two three R. Climbing and maintaining flight level three three zero, expecting vectors for ILS twenty three L.""
+
+2.",1,0.0,0.268,0.44,270,4.92
+"Greensboro Tower, N345GH, ILS 23R, 5 miles out.","Greensboro Tower, N345GH, ILS 23R, 5 miles out. Runway 23L is closed for maintenance, and there is moderate crosswind from the west at 15 knots. How should I adjust my approach to ensure a safe landing?",1,0.0,0.339,0.372,155,6.88
+"N466C7, wind 180 at 5, Runway 14 cleared to land.","N466C7, wind 180 at 5, Runway 14 cleared to land.**
+   - This instruction is correct. It provides a specific runway (14) for landing, which is appropriate given the wind direction (180 degrees) and speed (5 knots). The runway number corresponds to the magnetic heading rounded to the nearest 10 degrees, which in this case is 180 degrees.
+
+B. **",1,0.0,0.224,0.339,296,4.29
+"Greensboro Tower, DAL338, ILS 5, 5 miles out.","Greensboro Tower, DAL338, ILS 5, 5 miles out.**
+   - This clearance indicates that you are cleared to descend to the final approach fix (FAF) for the ILS approach to runway 5 at Greensboro Tower. The FAF for ILS approaches is typically located at a specific distance from the runway threshold, often around 5 to 7 nautical miles",1,0.0,0.205,0.314,283,4.04
+"Greensboro Approach, N123AB, level 10,000 feet, inbound to GSO.","Greensboro Approach, N123AB, level 10,000 feet, inbound to GSO. We have a medical emergency on board and request priority handling.""
+
+2. **ATC Response**: The controller acknowledges your request and provides instructions for priority handling. This might include vectors for a direct approach, clearance for a lower altitude, or expedited landing clearance.
+
+3. **Coordination with Ground Services**: Once you are",1,0.0,0.233,0.3,351,4.39
+"Greensboro Approach, N466C7, level 10,000 feet, inbound to GSO.","Greensboro Approach, N466C7, level 10,000 feet, inbound to GSO. Can you provide me with the current weather conditions at the airport and any NOTAMs that might affect my flight?
+
+Assistant: Sure, let me check that for you. According to the latest weather report, the visibility at GSO is currently 10 miles with scattered clouds at 3,500 feet. The wind is",1,0.0,0.242,0.321,292,4.45
+"N466C7, wind 180 at 5, Runway 14 cleared to land.","N466C7, wind 180 at 5, Runway 14 cleared to land.**
+   - This instruction is correct. It provides a specific runway (14) for landing, which is appropriate given the wind direction (180 degrees) and speed (5 knots). The runway number corresponds to the magnetic heading rounded to the nearest 10 degrees, which in this case is 180 degrees.
+
+B. **",1,0.0,0.224,0.339,296,4.29
+"N466C7, contact Greensboro Tower on 119.7.","N466C7, contact Greensboro Tower on 119.7. If you have any questions or need further assistance, feel free to reach out. Safe flying!",1,0.0,0.414,0.467,91,20.33
+"SWA519, wind 250 at 15, Runway 5 cleared to land.","SWA519, wind 250 at 15, Runway 5 cleared to land.**
+   - This is a standard landing clearance with a specific runway and wind information. It is clear and unambiguous.
+
+B. **Cleared to land runway 5, winds 260 at 20, QNH 1013.**
+    - This clearance includes runway information, wind direction and speed, and Q",1,0.0,0.214,0.408,261,5.18
+"Greensboro Tower, N123AB, ILS 23L, 3 miles out.","Greensboro Tower, N123AB, ILS 23L, 3 miles out. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15°C, dew point 10°C, altimeter setting 30.12 inHg.""",1,0.0,0.3,0.421,139,4.84
+"N466C7, wind 230 at 10, Runway 23L cleared to land.","N466C7, wind 230 at 10, Runway 23L cleared to land.**
+   - This clearance is correct. The aircraft is given a specific runway (23L) to land on, and the wind information is provided, which is standard practice.
+
+B. **N466D7, taxi to runway 27 via taxiways Alpha, Bravo, Charlie, hold short of runway 25.",1,0.0,0.233,0.37,251,5.04

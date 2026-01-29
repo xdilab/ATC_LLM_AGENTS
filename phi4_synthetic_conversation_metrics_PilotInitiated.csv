@@ -1,0 +1,384 @@
+Pilot Prompt,Generated ATC Response,BLEU,ROUGE-L,Edit Distance,Perplexity
+"Pilot: Requesting vectors for ILS Runway 23L, N345GH.","ATC: ""N345GH, vectors for the ILS 23 Left, turn right heading 270, descend and maintain 3,000, expect ILS approach runway 23 left.""
+```
+
+In this example, the pilot is requesting vectors for an Instrument Landing System (ILS) approach to runway 22 Left.",0.022,0.143,216,19.1
+"Pilot: Requesting descent to 6,500 feet, DAL338.","ATC: DAL338, descend and maintain 6500 feet, expect further clearance in 10 minutes.
+```
+
+In this example, the pilot is requesting to descend to a lower altitude, and the air traffic control (ATC) is acknowledging the request and providing instructions for the descent, including an expected time for further clearance.",0.015,0.091,285,6.91
+"Pilot: Inbound to GSO, level 10,000 feet, N123AB.","ATC: GSO Ground, GSO Tower, and GSO Departure, this is GSO Approach. N123 AB, you are number two for the ILS runway 36 approach. Reduce speed to 180 knots, descend and maintain 8,000. Turn right heading 270. Report established on the localizer",0.021,0.047,212,6.36
+"Pilot: N466C7, 10 miles out, request landing clearance for Runway 5.","ATC: Cleared to land runway 5, wind 270 at 10 knots, runway visual range 3 miles, temperature 15 degrees Celsius, QNH 1013 hPa. Report when established on the downwind leg.
+
+Pilot 1: Roger that, cleared to land 5. Will report when established",0.029,0.087,198,4.5
+"Pilot: Inbound to GSO, level 7,000 feet, N123AB.","ATC: GSO Ground, GSO Tower, and GSO Departure, this is GSO Approach. N123 AB, you are number 2 for the ILS runway 18 approach. Reduce speed to 180 knots and descend and maintain 5,500 feet. Report established on the localizer or when passing",0.019,0.047,212,7.01
+"Pilot: Cleared runway 23L, taxiing via Delta to Gate 3.","ATC: Taxi via Delta, contact Ground on 121.9 when ready for pushback.
+```
+
+In this example, the pilot acknowledges the clearance, confirms the taxi route, and informs ATC when they are ready to push back from the gate.
+
+By following these steps and using the correct phraseology, you can ensure a",0.014,0.075,258,5.76
+"Pilot: Requesting descent to 8,000 feet, AAL202.","ATC: Descend and maintain flight level 080, American Airlines 202. Expect vectors for the ILS approach to Runway 27L. Be advised, there is a reported wind shear in the vicinity of the airport.
+
+Pilot (AAL202): Roger that, descending to FL080 and preparing for ILS",0.017,0.047,230,5.74
+"Pilot: Ready for taxi to Signature, SWA519.","ATC: Signature, Southwest 519, cleared to taxi via Bravo, hold short of Alpha, contact ground on 121.9.
+```
+
+In this example, ""Signature"" is the name of the airport, and ""Alpha"" and ""Bravo"" refer to specific taxiways at that airport. The pilot acknowledges the clearance",0.007,0.089,239,6.2
+"Pilot: N466C7, holding short of Runway 5, ready for departure.","ATC: Cleared for immediate takeoff, runway 5. Wind 270 at 10 knots, gusting to 15. Be advised, there's an aircraft on final approach for runway 23. Maintain visual separation.
+
+Pilot 1: Roger that, cleared for takeoff from 5 with traffic on final for",0.014,0.045,211,4.65
+"Pilot: Cleared runway 14, taxiing via Bravo to Gate 3.","ATC: Taxi via Bravo, contact Ground on 121.9 when ready for pushback.
+```
+
+In this example, the pilot acknowledges the clearance, confirms the taxi route, and informs ATC when they are ready for the next step, which is pushback.
+
+By following these steps and maintaining clear communication, you can ensure",0.014,0.039,269,5.06
+"Pilot: N466C7, 10 miles out, request landing clearance for Runway 23L.","ATC: Cleared to land runway 23 Left, wind 270 at 10 knots, runway visual range 3 miles, temperature 15 degrees Celsius, altimeter 29.92 inches of mercury. Be advised, there is a Cessna 172 on final for runway 25R, maintain visual separation.
+P",0.018,0.082,197,4.6
+"Pilot: Cleared runway 14, taxiing via Delta to Signature.","ATC: N12345, taxi via Delta, hold short of Runway 14.
+```
+
+In this example, ""Delta"" is the taxiway that the pilot will use to reach the runway. The pilot acknowledges the instruction by repeating it back to ATC, which is a standard procedure to confirm that the message was received",0.02,0.083,238,7.2
+"Pilot: DAL338, 10 miles out, request landing clearance for Runway 23R.","ATC: Delta 338, you are cleared to land runway 23 Right, wind 270 at 10 knots, runway visual range 3,000 meters. Report when established on the downwind leg.
+
+Pilot (DAL338): Cleared to land 23 right, Delta338. Will report downwind.
+```",0.022,0.045,190,11.14
+"Pilot: Requesting descent to 8,000 feet, SWA519.","ATC: Descend and maintain flight level 080, Southwest 519. Expect vectors for the ILS approach to runway 27L.
+
+Pilot (SWA519): Descending to flight level zero eight zero, expect vectors for ILS runway two seven L, Southwest five one nine.
+```
+
+In this example, the",0.017,0.05,233,6.59
+"Pilot: Requesting descent to 7,000 feet, N466C7.","ATC: Roger, descend and maintain 7000, expect further clearance in 10 minutes.
+```
+
+In this example, the pilot is requesting to descend to a lower altitude, and the air traffic controller acknowledges the request and provides instructions for the descent, including an expected time for further clearance. This exchange ensures that both the pilot",0.008,0.043,312,7.42
+"Pilot: Inbound to GSO, level 7,000 feet, N123AB.","ATC: GSO Ground, GSO Tower, and GSO Departure, this is GSO Approach. N123 AB, you are number 2 for the ILS runway 18 approach. Reduce speed to 180 knots and descend and maintain 5,500 feet. Report established on the localizer or when passing",0.019,0.047,212,7.01
+"Pilot: Ready for taxi to Signature, N123AB.","ATC: Taxi to Signature via Alpha, hold short of Runway 27L, contact Ground on 121.9.
+```
+
+In this example, the pilot is instructed to taxi to the Signature gate via the Alpha taxiway and to hold short (stop) at the intersection of the taxiway with runway 27 Left (",0.015,0.095,232,5.92
+"Pilot: Ready for taxi to Signature, DAL338.","ATC: DAL338, cleared to taxi to runway 18R via taxiways Alpha, Bravo, hold short of runway 27L, contact ground on 121.9.
+```
+
+In this example, ""DAL338"" is the call sign for the aircraft operated by Delta Air Lines, and ""Signature"" refers to the",0.014,0.136,211,5.82
+"Pilot: Requesting vectors for ILS Runway 14, AAL202.","ATC: ""AAL202, descend and maintain 3,000 feet, turn left heading 270, vectors for the ILS approach to Runway Fourteen. Expect further clearance in 10 minutes.""
+```
+
+In this example, the pilot requests vectors for an Instrument Landing System (ILS) approach to runway 14",0.024,0.178,229,8.56
+"Pilot: Inbound to GSO, level 7,000 feet, DAL338.","ATC: DAL338, GSO Tower, you're cleared for the ILS runway 18 approach. Wind 270 at 10 knots, runway visual range 3 miles. Report established on the localizer or when passing the outer marker.
+
+Pilot (DAL338): Cleared for ILS 18, wind 270",0.015,0.0,206,7.25
+"Pilot: Requesting descent to 10,000 feet, N123AB.","ATC: Descend and maintain flight level one-zero-zero, squawk 4321, N456CD. Traffic alert, traffic at your 12 o'clock, 10 miles, same altitude, N789EF.
+Pilot 1: Descending to flight level 100, squawking four three two one, N",0.017,0.053,191,7.22
+"Pilot: Requesting vectors for ILS Runway 23L, N123AB.","ATC: Cleared for the ILS approach runway 23 left, maintain 3,000 until established on the localizer, squawk 4721.
+
+Pilot (N123AB): Cleared ILS 23 L, maintaining 3000, squawking 4712.
+```
+
+In this example, the",0.019,0.118,176,6.72
+"Pilot: N345GH, holding short of Runway 23R, ready for departure.","ATC: Cleared for takeoff runway 23 Right, wind 270 at 10, climb and maintain 5,000 feet, contact departure on 123.45.
+```
+
+In this example, ""N345GH"" is the tail number of the aircraft, and ""23R"" refers to a specific runway at",0.034,0.133,190,5.67
+"Pilot: Requesting vectors for ILS Runway 5, N466C7.","ATC: Cleared to ILS runway 5. Descend and maintain 3,000. Reduce speed to 210 knots. Expect vectors for the ILS approach.
+```
+
+In this example, the pilot is requesting vectors to align with the Instrument Landing System (ILS) for a specific runway. The air traffic controller",0.02,0.136,237,5.26
+"Pilot: Inbound to GSO, level 8,000 feet, N123AB.","ATC: GSO Ground, GSO Tower, and GSO Departure, this is GSO Approach. N123 AB, you are number 2 for the ILS runway 36 approach. Wind 270 at 5, visibility 10, ceiling 3,000 broken, altimeter 29.92. Report",0.02,0.0,170,6.59
+"Pilot: AAL202, 10 miles out, request landing clearance for Runway 14.","ATC: Cleared to land runway 14, wind 270 at 10 knots, runway visual range 3,000 meters.
+```
+Analyze the communication and provide a summary that includes the pilot's call sign, the flight number, the distance from the airport, the requested runway for landing, the wind direction and speed",0.017,0.085,240,4.83
+"Pilot: AAL202, 10 miles out, request landing clearance for Runway 23R.","ATC: Cleared to land runway 23 right, wind 270 at 5, visibility 10, altimeter 29.92.
+```
+
+In this example, ""AAL202"" is the call sign of the aircraft, which is a Boeing 737 operated by American Airlines. The call sign is used by the",0.032,0.0,193,5.5
+"Pilot: SWA519, request frequency change to Ground.","ATC: Southwest 519, frequency change approved, contact Ground on 121.9.
+```
+
+In this example, the pilot requests a frequency change from Tower to Ground, and ATC approves the request, providing the new frequency for the pilot to contact Ground control.",0.023,0.222,206,8.81
+"Pilot: Inbound to GSO, level 8,000 feet, N123AB.","ATC: GSO Ground, GSO Tower, and GSO Departure, this is GSO Approach. N123 AB, you are number 2 for the ILS runway 36 approach. Wind 270 at 5, visibility 10, ceiling 3,000 broken, altimeter 29.92. Report",0.02,0.0,170,6.59
+"Pilot: Cleared runway 23L, taxiing via Bravo to Gate 3.","ATC: Taxi via Bravo, contact Ground on 121.9 when ready for pushback.
+```
+
+In this example, the pilot acknowledges the clearance, confirms the taxi route, and informs ATC when they are ready to push back, ensuring a smooth transition from taxiing to takeoff.
+
+By following these steps and maintaining clear",0.018,0.113,268,5.15
+"Pilot: Requesting descent to 7,000 feet, DAL338.","ATC: DAL338, descend and maintain flight level 070, expect further clearance in 10 minutes.
+```
+
+In this example, ""DAL338"" is the call sign of the aircraft operated by Delta Air Lines. The call sign is used by the pilot to communicate with air traffic control (ATC) and by ATC",0.008,0.043,245,6.56
+"Pilot: Cleared runway 23R, taxiing via Bravo to Gate 3.","ATC: Taxi via Bravo, contact Ground on 121.9 when ready for pushback.
+```
+
+In this example, the pilot acknowledges the clearance, confirms the taxi route, and informs ATC when they are ready to push back, maintaining clear and concise communication throughout the process.
+
+By following these steps and maintaining clear communication,",0.014,0.078,296,4.95
+"Pilot: Ready for taxi to Atlantic, N466C7.","ATC: Taxi to Atlantic via Alpha, Bravo, Charlie, hold short of Runway 27.
+```
+
+In this example, the pilot acknowledges the instruction to taxi to the Atlantic gate using the specified taxiway route and confirms readiness. The ATC then provides the taxi route and instructs the pilot to hold short at Runway",0.016,0.098,276,6.74
+"Pilot: Requesting vectors for ILS Runway 23L, AAL202.","ATC: ""AAL202, cleared for the ILS approach runway 23 Left, maintain 3000 until established on the localizer, reduce speed to 180 knots.""
+```
+
+In this example, the pilot requests vectors for an Instrument Landing System (ILS) approach, and ATC responds with a clearance that includes",0.022,0.122,247,5.51
+"Pilot: Requesting descent to 10,000 feet, N123AB.","ATC: Descend and maintain flight level one-zero-zero, squawk 4321, N456CD. Traffic alert, traffic at your 12 o'clock, 10 miles, same altitude, N789EF.
+Pilot 1: Descending to flight level 100, squawking four three two one, N",0.017,0.053,191,7.22
+"Pilot: N345GH, 10 miles out, request landing clearance for Runway 5.","ATC: Cleared to land runway 5, wind 270 at 10 knots, runway visual range 3 miles.
+```
+Analyze the communication and provide a summary that includes the pilot's call sign, the aircraft's distance from the airport, the requested runway for landing, the wind direction and speed, and the runway",0.018,0.13,241,4.73
+"Pilot: Inbound to GSO, level 6,500 feet, N345GH.","ATC: GSO Ground, GSO Tower, and GSO Departure, this is GSO Approach. N123AB, you are cleared for the ILS approach to runway 18, maintain 5,000 feet until established on the localizer, then descend to minimums. Report established on localizer.
+Pilot",0.015,0.051,215,5.92
+"Pilot: AAL202, holding short of Runway 23R, ready for departure.","ATC: Cleared for takeoff, runway heading, climb and maintain 10,000 feet, expect further clearance at 20 DME.
+
+Pilot (AAL202): Cleared to 10K, runway 23 R, AAL 202.
+```
+
+In this example, the pilot acknowledges the clearance by repeating",0.028,0.048,195,7.36
+"Pilot: SWA519, 10 miles out, request landing clearance for Runway 14.","ATC: Southwest 519, you are cleared to land runway 14, wind 180 at 10 knots, runway visual range 3 miles, temperature 15 degrees Celsius, altimeter 29.92 inches of mercury. Report when established on the downwind leg.
+
+Pilot (SWA519): Cleared to land",0.034,0.042,206,5.44
+"Pilot: Requesting vectors for ILS Runway 5, N466C7.","ATC: Cleared to ILS runway 5. Descend and maintain 3,000. Reduce speed to 210 knots. Expect vectors for the ILS approach.
+```
+
+In this example, the pilot is requesting vectors to align with the Instrument Landing System (ILS) for a specific runway. The air traffic controller",0.02,0.136,237,5.26
+"Pilot: Requesting vectors for ILS Runway 23R, DAL338.","ATC: DAL338, you are cleared for the ILS approach to Runway Twenty-Three Right, maintain 3000 until established on the localizer, report when in sight of the runway.
+
+Pilot (DAL338): Cleared for the approach, maintaining 3,000, will report when runway in sight. DAL",0.018,0.154,230,5.71
+"Pilot: Cleared runway 14, taxiing via Bravo to Gate 3.","ATC: Taxi via Bravo, contact Ground on 121.9 when ready for pushback.
+```
+
+In this example, the pilot acknowledges the clearance, confirms the taxi route, and informs ATC when they are ready for the next step, which is pushback.
+
+By following these steps and maintaining clear communication, you can ensure",0.014,0.039,269,5.06
+"Pilot: Requesting descent to 8,000 feet, N345GH.","ATC: Descend and maintain 8000, expect further clearance in 10 minutes.
+```
+
+In this example, the pilot is requesting to descend to a lower altitude, and the air traffic control (ATC) acknowledges the request, instructing the pilot to maintain the new altitude and informing them that further clearance will be provided",0.007,0.045,286,4.42
+"Pilot: Ready for taxi to Signature, SWA519.","ATC: Signature, Southwest 519, cleared to taxi via Bravo, hold short of Alpha, contact ground on 121.9.
+```
+
+In this example, ""Signature"" is the name of the airport, and ""Alpha"" and ""Bravo"" refer to specific taxiways at that airport. The pilot acknowledges the clearance",0.007,0.089,239,6.2
+"Pilot: Cleared runway 14, taxiing via Bravo to Signature.","ATC: Taxi via Bravo, hold short of Runway 14.
+```
+
+In this example, the pilot is instructed to taxi to the runway via a specific taxiway (Bravo) and to stop before reaching the runway (hold short). This ensures that the aircraft does not enter an active runway without clearance, maintaining safety and",0.017,0.12,255,4.27
+"Pilot: N345GH, 10 miles out, request landing clearance for Runway 23R.","ATC: Cleared to land runway 23 Right, wind 270 at 10 knots, runway visual range 3 miles, expect moderate turbulence on final approach. Report when established on the downwind leg.
+```
+
+In this example, the pilot is informed about the wind direction and speed, the visual range of the runway,",0.017,0.04,247,4.58
+"Pilot: AAL202, request frequency change to Ground.","ATC: Roger that, AAL 202. You are cleared to change frequency to Ground on 121.9 MHz.
+```
+
+In this example, the pilot of American Airlines flight 202 is instructed by ATC to switch from the Tower frequency to the Ground frequency. The pilot acknowledges the instruction, and ATC confirms the",0.015,0.186,248,8.34
+"Pilot: SWA519, 10 miles out, request landing clearance for Runway 23R.","ATC: Southwest 519, you are cleared to land runway 23 Right, wind 270 at 10 knots, runway visual range 3 miles, temperature 15 degrees Celsius, altimeter 29.92 inches of mercury. Report when established on the downwind leg.
+
+Pilot (SWA519): Cleared to",0.034,0.041,207,5.57
+"Pilot: Cleared runway 23L, taxiing via Bravo to Atlantic.","ATC: Taxi via Bravo, contact ground on 121.9 when ready for takeoff.
+```
+
+In this example, the pilot acknowledges the instruction to taxi via Bravo and informs ATC that they will contact ground control on the specified frequency when they are ready to take off. This ensures a smooth transition from taxiing to take",0.018,0.16,271,4.87
+"Pilot: SWA519, 10 miles out, request landing clearance for Runway 14.","ATC: Southwest 519, you are cleared to land runway 14, wind 180 at 10 knots, runway visual range 3 miles, temperature 15 degrees Celsius, altimeter 29.92 inches of mercury. Report when established on the downwind leg.
+
+Pilot (SWA519): Cleared to land",0.034,0.042,206,5.44
+"Pilot: Requesting vectors for ILS Runway 23L, AAL202.","ATC: ""AAL202, cleared for the ILS approach runway 23 Left, maintain 3000 until established on the localizer, reduce speed to 180 knots.""
+```
+
+In this example, the pilot requests vectors for an Instrument Landing System (ILS) approach, and ATC responds with a clearance that includes",0.022,0.122,247,5.51
+"Pilot: Inbound to GSO, level 6,500 feet, DAL338.","ATC: DAL338, GSO Tower, you're cleared for the ILS runway 18 approach. Report established on the localizer or the glideslope as appropriate.
+```
+
+In this example, ""ILS"" stands for Instrument Landing System, which is a precision runway approach aid based on two radio beams that provide pilots",0.015,0.0,267,6.64
+"Pilot: Ready for taxi to Atlantic, DAL338.","ATC: DAL338, taxi to runway 27 via taxiways Alpha, Bravo, Charlie, hold short of runway 09. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15°C, dew point 10°C, QNH 1013 hPa.",0.013,0.103,186,4.5
+"Pilot: Requesting vectors for ILS Runway 14, SWA519.","ATC: RWY 14 ILS cleared, descend and maintain 3,000 feet, expect vectors for the approach.
+```
+
+In this example, the pilot requests vectors for an Instrument Landing System (ILS) approach to runway 14. The ATC clears the pilot for the ILS approach, instructs them to",0.019,0.15,227,5.31
+"Pilot: Requesting descent to 10,000 feet, SWA519.","ATC: Descend and maintain flight level 100, Southwest 519. Expect vectors for the ILS approach to runway 27L.
+
+Pilot (SWA519): Descending to flight level one zero zero, expect ILS runway two seven L, Southwest five one nine.
+```
+
+In this example, ""flight level",0.017,0.05,229,6.07
+"Pilot: Ready for taxi to Signature, SWA519.","ATC: Signature, Southwest 519, cleared to taxi via Bravo, hold short of Alpha, contact ground on 121.9.
+```
+
+In this example, ""Signature"" is the name of the airport, and ""Alpha"" and ""Bravo"" refer to specific taxiways at that airport. The pilot acknowledges the clearance",0.007,0.089,239,6.2
+"Pilot: Requesting vectors for ILS Runway 5, DAL338.","ATC: DAL338, you are cleared for the ILS approach to runway 5. Descend and maintain 3,000 feet, expect vectors for the approach. Reduce speed to 210 knots.
+
+Pilot (DAL338): Cleared for the instrument landing system approach, descending and maintaining three thousand, reducing speed to two",0.02,0.143,253,5.56
+"Pilot: Ready for taxi to Signature, DAL338.","ATC: DAL338, cleared to taxi to runway 18R via taxiways Alpha, Bravo, hold short of runway 27L, contact ground on 121.9.
+```
+
+In this example, ""DAL338"" is the call sign for the aircraft operated by Delta Air Lines, and ""Signature"" refers to the",0.014,0.136,211,5.82
+"Pilot: N466C7, holding short of Runway 23R, ready for departure.","ATC: Cleared for immediate takeoff, runway heading, climb and maintain 5,000 feet, contact Departure on 123.45.
+
+Pilot (after takeoff): Departure, Cessna 7C6N, climbing through 1,000.
+Departure: Cessra 6C7",0.015,0.054,168,6.2
+"Pilot: AAL202, holding short of Runway 14, ready for departure.","ATC: Cleared for takeoff, runway 14. Climb and maintain 10,000 feet, expect further clearance at 15,000.
+
+Pilot (to co-pilot): ATC has cleared us for departure. Let's go through the pre-takeoff checklist.
+
+Co-pilot: Affirmative.",0.028,0.1,188,4.18
+"Pilot: Requesting vectors for ILS Runway 14, N345GH.","ATC: ""N345GH, descend and maintain 3,000 feet, turn left heading 270, vectors for the ILS approach to Runway Fourteen.""
+```
+
+In this example, the pilot is requesting vectors for an Instrument Landing System (ILS) approach to runway 14. The air traffic controller responds by",0.024,0.174,233,7.96
+"Pilot: DAL338, 10 miles out, request landing clearance for Runway 5.","ATC: Roger, DAL338. You are cleared to land on runway 5. Wind 270 at 10 knots, runway visual range 3 miles, temperature 15 degrees Celsius, altimeter 29.92 inches of mercury. Report when you are established on the downwind leg.
+```
+
+
+## response
+
+Pilot",0.029,0.08,206,6.47
+"Pilot: Cleared runway 23L, taxiing via Delta to Atlantic.","ATC: Cessna 123AB, cleared to taxi via Delta, hold short of Atlantic.
+```
+
+In this example, ""Delta"" is a taxiway, and ""Atlantic"" is another taxiway or a runway. The phrase ""via Delta"" indicates that the pilot should follow the path along taxiway Delta to reach",0.018,0.17,215,5.34
+"Pilot: Requesting descent to 7,000 feet, N123AB.","ATC: Roger, descend and maintain 7000 feet, squawk 4321. Expect vectors for the ILS approach to Runway 27.
+
+Pilot (N123AB): Descending to seven thousand, squawking four three two one. Ready for vectors to ILS 27.
+```
+
+In this example",0.017,0.105,201,6.21
+"Pilot: Inbound to GSO, level 8,000 feet, SWA519.","ATC: Southwest 519, GSO traffic, Cessna 172, 5 miles south at your 3 o'clock, 2,500 feet.
+Pilot (SWA519): Roger, traffic in sight, maintaining altitude.
+```
+
+In this example, the pilot acknowledges the traffic information and confirms that they have",0.018,0.0,217,8.27
+"Pilot: Requesting vectors for ILS Runway 23L, SWA519.","ATC: SWA 519, cleared for the ILS approach runway 23 left, maintain 3000 until established on the localizer, then cleared to 2000. Reduce speed to 180 knots. Report established on localizer.
+```
+
+In this example, the pilot requests vectors for an Instrument Landing System (IL",0.02,0.136,245,6.72
+"Pilot: Ready for taxi to Atlantic, AAL202.","ATC: Taxi to Atlantic via Alpha, Bravo, Charlie, hold short of runway 27L. Expect a 10-minute delay due to runway maintenance.
+```
+
+In this example, the pilot is instructed to taxi to the Atlantic gate using the specified taxiway route and to hold short at the designated runway. The mention of a",0.015,0.093,265,6.61
+"Pilot: Ready for taxi to Atlantic, N466C7.","ATC: Taxi to Atlantic via Alpha, Bravo, Charlie, hold short of Runway 27.
+```
+
+In this example, the pilot acknowledges the instruction to taxi to the Atlantic gate using the specified taxiway route and confirms readiness. The ATC then provides the taxi route and instructs the pilot to hold short at Runway",0.016,0.098,276,6.74
+"Pilot: Cleared runway 23L, taxiing via Delta to Signature.","ATC: N12345, taxi via Delta, hold short of Signature.
+```
+
+In this example, ""Delta"" is a taxiway, and ""Signature"" is another taxiway or possibly a runway. The pilot acknowledges the clearance and repeats the instructions back to ATC for confirmation. This ensures that both the pilot and AT",0.018,0.167,249,8.12
+"Pilot: Ready for taxi to Atlantic, N123AB.","ATC: Taxi to runway 27 via taxiways Alpha, Bravo, Charlie, hold short of runway 18. Be advised, there is a maintenance vehicle on taxiway Bravo, proceed with caution.
+```
+
+In this example, the pilot is instructed to taxi to the runway using specific taxiways and to be cautious of a maintenance",0.012,0.091,266,3.75
+"Pilot: Cleared runway 23R, taxiing via Charlie to Atlantic.","ATC: N12345, hold short of Runway 23L, traffic on short final.
+```
+
+In this example, the pilot is cleared to taxi to the runway via a specific taxiway (Charlie) and is given a hold short instruction due to another aircraft on final approach. This ensures that the pilot knows exactly where",0.015,0.13,242,6.85
+"Pilot: Inbound to GSO, level 10,000 feet, DAL338.","ATC: DAL338, GSO Tower, you are cleared for the ILS runway 18 approach. Report established on the localizer or the glideslope as appropriate.
+```
+
+In this example, ""ILS"" stands for Instrument Landing System, which is a precision runway approach aid based on two radio beams that provide pilots",0.015,0.0,268,6.21
+"Pilot: Requesting vectors for ILS Runway 14, N345GH.","ATC: ""N345GH, descend and maintain 3,000 feet, turn left heading 270, vectors for the ILS approach to Runway Fourteen.""
+```
+
+In this example, the pilot is requesting vectors for an Instrument Landing System (ILS) approach to runway 14. The air traffic controller responds by",0.024,0.174,233,7.96
+"Pilot: N123AB, 10 miles out, request landing clearance for Runway 23L.","ATC: Cleared to land runway 23 left, wind 270 at 5, visibility 10, altimeter 2992.
+```
+
+In this example, the pilot requests landing clearance, and ATC provides the necessary information for a safe landing, including runway assignment, wind direction and speed, visibility, and altimeter",0.02,0.085,232,4.01
+"Pilot: Inbound to GSO, level 10,000 feet, N345GH.","ATC: GSO Ground, GSO Tower, and GSO Departure, this is GSO Approach. N345 GH, you are number two for the ILS runway 18 approach. Reduce speed to 180 knots and descend and maintain 8,000. Expect vectors for the approach. Wind 270 at 10",0.023,0.049,202,7.71
+"Pilot: Requesting vectors for ILS Runway 23L, N345GH.","ATC: ""N345GH, vectors for the ILS 23 Left, turn right heading 270, descend and maintain 3,000, expect ILS approach runway 23 left.""
+```
+
+In this example, the pilot is requesting vectors for an Instrument Landing System (ILS) approach to runway 22 Left.",0.022,0.143,216,19.1
+"Pilot: Cleared runway 14, taxiing via Delta to Atlantic.","ATC: Taxi via Delta, hold short of Atlantic.
+```
+
+In this example, ""Delta"" is a taxiway, and ""Atlantic"" is another taxiway or possibly a runway. The pilot is instructed to taxi via the Delta taxiway and then hold short (stop) at the intersection with the Atlantic taxiway/runway",0.014,0.186,234,4.85
+"Pilot: N466C7, request frequency change to Ground.","ATC: Cessna 7C6, frequency change approved, contact Ground on 121.9.
+```
+
+In this example, the pilot requests a frequency change from Tower to Ground, and ATC approves the request, providing the new frequency for the pilot to switch to. This ensures that the pilot is on the correct",0.018,0.195,239,5.44
+"Pilot: Ready for taxi to Atlantic, AAL202.","ATC: Taxi to Atlantic via Alpha, Bravo, Charlie, hold short of runway 27L. Expect a 10-minute delay due to runway maintenance.
+```
+
+In this example, the pilot is instructed to taxi to the Atlantic gate using the specified taxiway route and to hold short at the designated runway. The mention of a",0.015,0.093,265,6.61
+"Pilot: Requesting descent to 6,500 feet, AAL202.","ATC: Descend and maintain 6500 feet, American Airlines 202. Traffic alert, traffic at your 3 o'clock, 5 miles, same altitude. Advise when level.
+```
+
+In this exchange, the pilot requests a descent to a lower altitude, and the air traffic control (ATC) acknowledges the",0.019,0.136,237,6.75
+"Pilot: AAL202, request frequency change to Ground.","ATC: Roger that, AAL 202. You are cleared to change frequency to Ground on 121.9 MHz.
+```
+
+In this example, the pilot of American Airlines flight 202 is instructed by ATC to switch from the Tower frequency to the Ground frequency. The pilot acknowledges the instruction, and ATC confirms the",0.015,0.186,248,8.34
+"Pilot: Cleared runway 5, taxiing via Bravo to Atlantic.","ATC: Taxi via Bravo, contact ground on 121.9 when ready for takeoff.
+```
+
+In this example, the pilot is instructed to taxi to the runway using the Bravo taxiway and to switch to the ground frequency when they are ready to take off. This ensures that the ground controller is aware of the aircraft's",0.014,0.167,256,5.04
+"Pilot: Inbound to GSO, level 6,500 feet, AAL202.","ATC: GSO Tower, this is American Airlines 202, inbound for landing, request runway 18R.
+Pilot (AAL202): American 202 with you, GSO tower, requesting 18 right for landing.
+
+ATC (GSO Tower): AAL 202 cleared to land on 18 Right,",0.02,0.051,192,10.17
+"Pilot: Ready for taxi to Atlantic, AAL202.","ATC: Taxi to Atlantic via Alpha, Bravo, Charlie, hold short of runway 27L. Expect a 10-minute delay due to runway maintenance.
+```
+
+In this example, the pilot is instructed to taxi to the Atlantic gate using the specified taxiway route and to hold short at the designated runway. The mention of a",0.015,0.093,265,6.61
+"Pilot: Requesting descent to 7,000 feet, DAL338.","ATC: DAL338, descend and maintain flight level 070, expect further clearance in 10 minutes.
+```
+
+In this example, ""DAL338"" is the call sign of the aircraft operated by Delta Air Lines. The call sign is used by the pilot to communicate with air traffic control (ATC) and by ATC",0.008,0.043,245,6.56
+"Pilot: Inbound to GSO, level 10,000 feet, AAL202.","ATC: GSO Tower, this is American Airlines 202, inbound for landing, request runway 18R.
+Pilot (AAL202): American 202 with you, GSO tower, inbound on a 10-mile final for 18 right, request landing.
+```
+
+In this example, the pilot of American Airlines",0.02,0.0,215,10.49
+"Pilot: Cleared runway 5, taxiing via Charlie to Atlantic.","ATC: Taxi via Charlie, contact ground on 121.9 when ready for pushback.
+```
+
+In this example, the pilot is cleared to taxi to the runway using taxiway Charlie and is instructed to contact ground control on a different frequency when they are ready to push back from the gate.
+
+In summary, the phrase """,0.014,0.163,253,4.97
+"Pilot: Inbound to GSO, level 6,500 feet, SWA519.","ATC: Southwest 519, GSO traffic, Cessna 172, 5 miles south at your 3 o'clock, 1,000 feet below you, will be crossing your extended centerline in 2 minutes.
+Pilot (SWA519): GSO Tower, Southwest Five-One-Nine, roger",0.018,0.0,181,10.51
+"Pilot: DAL338, holding short of Runway 23L, ready for departure.","ATC: Delta 338, cleared for immediate takeoff, wind 270 at 10 knots, runway 23 Left, climb and maintain 3,000 feet, expect further clearance at 5 DME.
+
+Pilot (Delta 338): Cleared for takeoff Runway Twenty-Three Left, climbing to 3",0.019,0.047,186,7.52
+"Pilot: Cleared runway 23R, taxiing via Bravo to Gate 3.","ATC: Taxi via Bravo, contact Ground on 121.9 when ready for pushback.
+```
+
+In this example, the pilot acknowledges the clearance, confirms the taxi route, and informs ATC when they are ready to push back, maintaining clear and concise communication throughout the process.
+
+By following these steps and maintaining clear communication,",0.014,0.078,296,4.95
+"Pilot: DAL338, holding short of Runway 14, ready for departure.","ATC: Delta 338, cleared for takeoff, runway 14. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15 degrees Celsius, QNH 1013 hPa. Report reaching 10,000 feet.
+
+Pilot (DAL338): Cleared",0.019,0.049,179,6.37
+"Pilot: Ready for taxi to Signature, N345GH.","ATC: Taxi to Signature via Alpha, hold short of Runway 27.
+```
+
+In this example, the pilot is instructed to taxi to the Signature hangar using the Alpha taxiway and to stop before entering Runways 27. This ensures that the pilot knows exactly where to go and where to stop, maintaining safety and",0.015,0.091,264,5.66
+"Pilot: Requesting descent to 8,000 feet, SWA519.","ATC: Descend and maintain flight level 080, Southwest 519. Expect vectors for the ILS approach to runway 27L.
+
+Pilot (SWA519): Descending to flight level zero eight zero, expect vectors for ILS runway two seven L, Southwest five one nine.
+```
+
+In this example, the",0.017,0.05,233,6.59
+"Pilot: AAL202, request frequency change to Ground.","ATC: Roger that, AAL 202. You are cleared to change frequency to Ground on 121.9 MHz.
+```
+
+In this example, the pilot of American Airlines flight 202 is instructed by ATC to switch from the Tower frequency to the Ground frequency. The pilot acknowledges the instruction, and ATC confirms the",0.015,0.186,248,8.34
+"Pilot: Requesting vectors for ILS Runway 23R, N345GH.","ATC: ""N345GH, cleared for the ILS approach runway 23 right, maintain 3000 until established on the localizer, contact Approach on 123.45.""
+```
+
+In this example, the pilot requests vectors for an Instrument Landing System (ILS) approach to runway 22R, and ATC",0.024,0.14,219,6.17
+"Pilot: Inbound to GSO, level 10,000 feet, N345GH.","ATC: GSO Ground, GSO Tower, and GSO Departure, this is GSO Approach. N345 GH, you are number two for the ILS runway 18 approach. Reduce speed to 180 knots and descend and maintain 8,000. Expect vectors for the approach. Wind 270 at 10",0.023,0.049,202,7.71
+"Pilot: N123AB, holding short of Runway 14, ready for departure.","ATC: Cleared for takeoff runway 14. Wind 270 at 10 knots, visibility 10 miles, scattered clouds at 3000 feet, temperature 15 degrees Celsius, altimeter 29.92. Contact Departure on 123.45 after takeoff.
+
+Pilot (after takeoff): N123",0.014,0.048,194,4.11
+"Pilot: DAL338, 10 miles out, request landing clearance for Runway 14.","ATC: Delta 338, you are cleared to land on runway 14, wind 270 at 10 knots, runway visual range 3,000 meters. Report when established on the downwind leg.
+
+Pilot (DAL338): Cleared for landing on 14. Will report when on downwind. DAL338.",0.035,0.136,189,8.38
+"Pilot: Inbound to GSO, level 7,000 feet, SWA519.","ATC: Southwest 519, GSO traffic, Cessna 172, 5 miles south at your 3 o'clock, 1,500 feet below you, will be crossing your extended centerline in 2 minutes.
+```
+
+In this example, the pilot of SWA 519 is informed about the Cess",0.019,0.0,193,9.63
+"Pilot: N345GH, 10 miles out, request landing clearance for Runway 23R.","ATC: Cleared to land runway 23 Right, wind 270 at 10 knots, runway visual range 3 miles, expect moderate turbulence on final approach. Report when established on the downwind leg.
+```
+
+In this example, the pilot is informed about the wind direction and speed, the visual range of the runway,",0.017,0.04,247,4.58
