@@ -193,7 +193,6 @@ else:
         snapshot_df["DT Time"] = ""
         snapshot_df["__dt"] = pd.NaT
 
-
 # -------------------------------
 # MODELS
 # -------------------------------
@@ -205,7 +204,6 @@ phi4_model = AutoModelForCausalLM.from_pretrained(
     low_cpu_mem_usage=True,
 ).eval()
 debug_line("[INIT] Phi-4 response model loaded.")
-
 
 # Whisper setup
 whisper_model = None
@@ -253,13 +251,12 @@ def _audio_duration_sec(path: str) -> float | None:
 
 KGSO_DEP_FREQ_A = "124.35"  # sectors 250–049 (wraps across 360→0)
 KGSO_DEP_FREQ_B = "126.6"   # sectors 050–249
-
 # -------------------------------
 # Helpers / parsing / gates
 # -------------------------------
 # -----------------------
 # XAION: Runway/Phase heuristics + anomaly detectors + monitor payload
-
+# Paste this block after your imports near the top of XAION_CONTROL_fullscript.py
 # -----------------------
 # -----------------------
 # XAION: Runway loader + LLM monitor (full implementations)
@@ -377,7 +374,6 @@ def repair_transcript_with_llm(
     dt_context: str | None = None,
     rag_snippets: str | None = None,
 ) -> str:
-
     """
     Use the Phi-4 ATC model as a transcript corrector.
     Input: noisy ASR from Whisper.
@@ -482,7 +478,7 @@ XAION_RUNWAYS = list(_DEFAULT_XAION_RUNWAYS)  # global runtime list
 
 def set_xaion_runways(runways: List[Dict]):
     """
-
+    Replace the in-memory XAION_RUNWAYS with a provided list of runway dicts.
     Each runway dict must contain keys: 'id', 'lat', 'lon', 'true_heading'.
     Example:
         set_xaion_runways([{'id':'05','lat':36.1,'lon':-79.93,'true_heading':52.0}, ...])
@@ -4666,7 +4662,6 @@ def single_handoff(comm_type: str, scenario_text: str):
 
 
 # ===============================
-
 # Unified run handler + Gradio UI (Pilot transcript visible only in Vocal Input)
 # ===============================
 
