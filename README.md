@@ -129,10 +129,10 @@ The example below reflects the current direction of the prototype more accuratel
 
 ```text
 Vocal Input / Pilot:
-Greensboro Approach, DAL142, level six thousand feet, inbound to GSO.
+Greensboro Approach, Delta one forty two, level six thousand feet, inbound to GSO.
 
 ASR Output:
-Greensboro Approach, DAL142, level 6000 feet, inbound to GSO.
+greensboro approach delta one forty two level six thousand feet inbound to gso
 
 Corrected Transcription:
 Greensboro Approach, DAL142, level 6000 feet, inbound to GSO.
@@ -144,7 +144,7 @@ Phi-4 Responder:
 DAL142, radar contact, descend and maintain 4,000, expect ILS Runway 23L.
 
 Phi-4 Monitor:
-Valid ATC line. The response preserves the call sign, altitude assignment, runway, and one-line FAA-style phraseology.
+Valid ATC line. The response preserves the call sign, assigned altitude, runway, and one-line FAA-style phraseology.
 
 TTS Output:
 The validated ATC response is converted to speech through ElevenLabs.
